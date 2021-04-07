@@ -12,13 +12,15 @@
 #' @param stack_method A character (method for stacking the images)
 #' @param higher_contrast_slices A logical (T/F for enhancing the contrast of the slices)
 #' @param higher_contrast_stack A logical (T/F for enhancing the constrast of the z-stack)
+#' @param normalize_stack A logical (T/F for normalizing intensities of stack)
 
 convertCziToTif <- function(input_file = NULL,
                             convert_all_slices = TRUE,
                             stack_image = TRUE,
                             stack_method = "average",
-                            higher_contrast_slices = TRUE,
-                            higher_contrast_stack = TRUE) {
+                            higher_contrast_slices = FALSE,
+                            higher_contrast_stack = TRUE,
+                            normalize_stack = TRUE) {
   if(is.null(input_file)){
     print("Please call function with input file.")
     return()
@@ -83,7 +85,7 @@ convertCziToTif <- function(input_file = NULL,
   if(higher_contrast_slices){
 
     Image_Data_histogram_equalization <- EBImage::combine(lapply(X = EBImage::getFrames(y = Image_Data, type = "render"),
-                                                   FUN = function(frame){EBImage::clahe(x = frame)}))
+                                                                 FUN = function(frame){EBImage::clahe(x = frame)}))
 
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], "_histogram_equalized.tif", sep="")
@@ -102,5 +104,20 @@ convertCziToTif <- function(input_file = NULL,
 
   }
 
-  return()
+  # Normalize contrast of enhanced z-stack ---------------------------------
+  if(normalize_stack){
+
+    Image_Stack_normalized <- Image_Stack_histogram_equalization
+
+    for(i in 1:3){
+      if(max(Image_Stack[,,i]) > 0){
+        Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
+      }
+    }
+
+    stack_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack_normalized.tif", sep="")
+    EBImage::writeImage(x = Image_Stack_normalized, files = stack_file_name, type = "tiff", bits.per.sample = 8)
+
+  }
+
 }

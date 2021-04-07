@@ -15,8 +15,9 @@ convertCziToTif(
   convert_all_slices = TRUE,
   stack_image = TRUE,
   stack_method = "average",
-  higher_contrast_slices = TRUE,
-  higher_contrast_stack = TRUE
+  higher_contrast_slices = FALSE,
+  higher_contrast_stack = TRUE,
+  normalize_stack = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ convertCziToTif(
 \item{higher_contrast_slices}{A logical (T/F for enhancing the contrast of the slices)}
 
 \item{higher_contrast_stack}{A logical (T/F for enhancing the constrast of the z-stack)}
+
+\item{normalize_stack}{A logical (T/F for normalizing intensities of stack)}
 }
 \description{
 Imports czi file and save them as tif

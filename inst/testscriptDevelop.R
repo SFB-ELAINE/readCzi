@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/03/05
+# Last changed: 2021/04/07
 
 
 # Delete everything in the environment
@@ -54,7 +54,8 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/181017_ES3_365_x63_zstack_3.czi"
+input_file <- "tests/EV52_6_links_63x_zstack_3 nur rot.czi"
+input_folder <- "tests/"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -67,6 +68,23 @@ image_data <- readCzi(input_file <- input_file)
 df_metadata <- readCziMetadata(input_file <- input_file)
 
 # Test script for converting a czi file into a tif file --------------------
-convetoCziToTif(input_file <- input_file)
+convertCziToTif(input_file <- input_file)
+
+### Test with files in folder ----------------------------------------------
+
+czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
+
+for(i in 1:length(czi_files)){
+  convertCziToTif(input_file = czi_files[i])
+
+  if(i == 1){
+    df_metadata <- readCziMetadata(input_file <- czi_files[i])
+  }else{
+    df_dummy <- readCziMetadata(input_file <- czi_files[i])
+    df_metadata <- rbind(df_metadata, df_dummy)
+  }
+}
+
+save(df_metadata, file = paste(input_folder, "output/df_metadata.Rda", sep=""))
 
 

@@ -12,7 +12,7 @@ readCzi(input_file = NULL)
 \item{input_file}{A character (path to czi file to be converted)}
 }
 \description{
-Imports czi files and save the metadata
+Imports czi files
 }
 \details{
 The function returns a multidimensional array with pixel
