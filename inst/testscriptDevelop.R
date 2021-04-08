@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/04/07
+# Last changed: 2021/04/08
 
 
 # Delete everything in the environment
@@ -75,7 +75,7 @@ convertCziToTif(input_file <- input_file)
 czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
 
 for(i in 1:length(czi_files)){
-  convertCziToTif(input_file = czi_files[i])
+  convertCziToTif(input_file = czi_files[i], convert_all_slices = FALSE)
 
   if(i == 1){
     df_metadata <- readCziMetadata(input_file <- czi_files[i])
@@ -86,5 +86,6 @@ for(i in 1:length(czi_files)){
 }
 
 save(df_metadata, file = paste(input_folder, "output/df_metadata.Rda", sep=""))
+write.csv2(x = df_metadata, file = paste(input_folder, "output/df_metadata_de.csv", sep=""))
 
 
