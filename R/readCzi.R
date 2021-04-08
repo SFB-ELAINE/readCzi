@@ -126,7 +126,7 @@ readCzi <- function(input_file = NULL) {
   red_id <- ifelse(test = test_red, yes = which(wavelengths > lower_limit_red), no = 0)
   if(length(red_id) > 1){print("More than one red channel!?")}
 
-  test_green <- all( (upper_limit_blue) <= wavelengths & (wavelengths <= lower_limit_red))
+  test_green <- any( (upper_limit_blue) <= wavelengths & (wavelengths <= lower_limit_red))
   green_id <- ifelse(test = test_green, yes = which((upper_limit_blue <= wavelengths) & (wavelengths <= lower_limit_red)), no = 0)
   if(length(green_id) > 1){print("More than one green channel!?")}
 
@@ -159,21 +159,27 @@ readCzi <- function(input_file = NULL) {
     # not existing colors
     copy_image_loaded <- image_loaded
 
+    image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 3, dim_z))
+
     # add missing channel(s)
     if(number_of_channels != 3){
-      image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 3, dim_z))
       image_loaded[,,-which(rgb_layers == 0),] <- copy_image_loaded
     }
 
-    if(rgb_layers[1] != 0){
-      image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,]
+    if(length(dim(copy_image_loaded)) == 8){
+      if(rgb_layers[1] != 0){
+        image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,]
+      }
+      if(rgb_layers[2] != 0){
+        image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,,,,]
+      }
+      if(rgb_layers[3] != 0){
+        image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,,]
+      }
+    }else{
+      print("The dimensions of the image does not fit.")
     }
-    if(rgb_layers[2] != 0){
-      image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,,,,]
-    }
-    if(rgb_layers[3] != 0){
-      image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,,]
-    }
+
 
     # Drop all arrays with dim=1 (except the channel, if C=1)
     #image_loaded <- drop(image_loaded)

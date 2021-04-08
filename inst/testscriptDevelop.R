@@ -9,7 +9,7 @@ rm(list = ls())
 # close all open plots in RStudio
 graphics.off()
 
-# Load packages #############################################################
+# Load packages ############################################################
 
 list.of.packages <- c("BiocManager", "reticulate")
 #list.of.packages <- c("tiff", "dplyr", "devtools", "BiocManager", "xlsx", "zis", "reticulate")
@@ -54,7 +54,8 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/EV52_6_links_63x_zstack_3 nur rot.czi"
+input_file <- "tests/190815_EV38_2_Kollagen mit Asc u Dexa_63x_zstack_6.czi"
+#input_file <- "tests/210301_EV38_Kollagen + WF_1_1024x1024_z-stack_1.czi"
 input_folder <- "tests/"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -68,7 +69,7 @@ image_data <- readCzi(input_file <- input_file)
 df_metadata <- readCziMetadata(input_file <- input_file)
 
 # Test script for converting a czi file into a tif file --------------------
-convertCziToTif(input_file <- input_file)
+convertCziToTif(input_file <- input_file, convert_all_slices = FALSE)
 
 ### Test with files in folder ----------------------------------------------
 
