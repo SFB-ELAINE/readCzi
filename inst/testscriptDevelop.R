@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/04/08
+# Last changed: 2021/05/01
 
 
 # Delete everything in the environment
@@ -54,9 +54,9 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/190815_EV38_2_Kollagen mit Asc u Dexa_63x_zstack_6.czi"
+input_file <- "tests/Well-01-30 min.czi"
 #input_file <- "tests/210301_EV38_Kollagen + WF_1_1024x1024_z-stack_1.czi"
-input_folder <- "tests/"
+#input_folder <- "tests/"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

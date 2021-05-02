@@ -11,6 +11,10 @@ readCzi(input_file = NULL)
 \arguments{
 \item{input_file}{A character (path to czi file to be converted)}
 }
+\value{
+A multidimensional array with the following dimensions:
+\code(x, y, c, z) with the channels \code{c}.
+}
 \description{
 Imports czi files
 }

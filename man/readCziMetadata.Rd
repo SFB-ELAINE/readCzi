@@ -12,6 +12,9 @@ readCziMetadata(input_file = NULL)
 \arguments{
 \item{input_file}{A character (path to czi file to be read)}
 }
+\value{
+A data frame with key information from the metadata is returned.
+}
 \description{
 Reads and saves key values from czi metadata as well as
 entire metadata as txt

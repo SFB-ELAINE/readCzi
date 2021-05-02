@@ -12,7 +12,7 @@
 \usage{
 convertCziToTif(
   input_file = NULL,
-  convert_all_slices = TRUE,
+  convert_all_slices = FALSE,
   stack_image = TRUE,
   stack_method = "average",
   higher_contrast_slices = FALSE,
@@ -23,15 +23,18 @@ convertCziToTif(
 \arguments{
 \item{input_file}{A character (path to czi file to be converted)}
 
-\item{convert_all_slices}{A logical (T/F for converting and saving all z-slices)}
+\item{convert_all_slices}{A logical (T/F for converting and saving all
+z-slices)}
 
 \item{stack_image}{A logical (T/F for calculating a z-stack)}
 
 \item{stack_method}{A character (method for stacking the images)}
 
-\item{higher_contrast_slices}{A logical (T/F for enhancing the contrast of the slices)}
+\item{higher_contrast_slices}{A logical (T/F for enhancing the contrast
+of the slices)}
 
-\item{higher_contrast_stack}{A logical (T/F for enhancing the constrast of the z-stack)}
+\item{higher_contrast_stack}{A logical (T/F for enhancing the contrast
+of the z-stack or original image if it is not a z stack)}
 
 \item{normalize_stack}{A logical (T/F for normalizing intensities of stack)}
 }
