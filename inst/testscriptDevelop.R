@@ -59,10 +59,10 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#input_file <- "tests/AxioImager_Test.czi"
+input_file <- "tests/AxioImager_Test.czi"
 #input_file <- "tests/Apotome_Test.czi"
 #input_file <- "tests/LSM_Test_twoChannels.czi"
-input_file <- "tests/LSM_Test_threeChannels.czi"
+#input_file <- "tests/LSM_Test_threeChannels.czi"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

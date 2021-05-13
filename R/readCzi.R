@@ -90,6 +90,9 @@ readCzi <- function(input_file = NULL) {
   pos_z <- NULL
   pos_rgba <- NULL
 
+  if("S" %in% axes){
+    pos_scenes <- grep(pattern = "S", x = axes)
+  }
   if("C" %in% axes){
     pos_channels <- grep(pattern = "C", x = axes)
   }
@@ -237,6 +240,32 @@ readCzi <- function(input_file = NULL) {
 
       # Check if the resulting array contains as many entries as needed
       if(length(dim(image_loaded)) != length(new_array_order)){
+        print("There is more or less information than thought in the image.")
+        return()
+      }
+
+
+    }else if(length(dim(copy_image_loaded)) == 5){
+
+      if(rgb_layers[1] != 0){
+        image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,]
+      }
+      if(rgb_layers[2] != 0){
+        image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,]
+      }
+      if(rgb_layers[3] != 0){
+        image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,]
+      }
+
+
+      # Check if the resulting array contains as many entries as needed
+      if(dim_z == 1){
+        check_array_dims <- length(new_array_order) + 1
+      }else{
+        check_array_dims <- length(new_array_order)
+      }
+
+      if(length(dim(image_loaded)) != check_array_dims){
         print("There is more or less information than thought in the image.")
         return()
       }

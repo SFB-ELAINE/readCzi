@@ -4,12 +4,15 @@
 \alias{readCziMetadata_LSM}
 \title{Check for apotome-specific values in metadata}
 \usage{
-readCziMetadata_LSM(input_file = NULL, number_of_channels = number_of_channels)
+readCziMetadata_LSM(
+  metadata = metadata,
+  number_of_channels = number_of_channels
+)
 }
 \arguments{
-\item{number_of_channels}{A number}
-
 \item{metadata}{A character (loaded metadata in a string)}
+
+\item{number_of_channels}{A number}
 }
 \description{
 Check for apotome-specific values in metadata
