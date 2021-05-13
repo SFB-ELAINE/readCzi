@@ -1,7 +1,12 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/05/01
+# Last changed: 2021/05/13
+
+
+# ATTENTION: It is better to use/import small(er) czi files. So please do
+# not save the images as scenes, whenever possible. Otherwise the allocation
+# of enough disk/memory space could be a problem!
 
 
 # Delete everything in the environment
@@ -54,9 +59,10 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/Well-01-30 min.czi"
-#input_file <- "tests/210301_EV38_Kollagen + WF_1_1024x1024_z-stack_1.czi"
-#input_folder <- "tests/"
+#input_file <- "tests/AxioImager_Test.czi"
+#input_file <- "tests/Apotome_Test.czi"
+#input_file <- "tests/LSM_Test_twoChannels.czi"
+input_file <- "tests/LSM_Test_threeChannels.czi"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
