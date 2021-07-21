@@ -10,12 +10,14 @@
 #' @param convert_all_slices A logical (T/F for converting and saving all
 #' z-slices)
 #' @param stack_image A logical (T/F for calculating a z-stack)
-#' @param stack_method A character (method for stacking the images)
+#' @param stack_method A character (method for stacking the images: average,
+#' maxprojection)
 #' @param higher_contrast_slices A logical (T/F for enhancing the contrast
 #' of the slices)
 #' @param higher_contrast_stack A logical (T/F for enhancing the contrast
 #' of the z-stack or original image if it is not a z stack)
 #' @param normalize_stack A logical (T/F for normalizing intensities of stack)
+#' @param change_layers A character (either "none" or, e.g., "green<->red")
 
 convertCziToTif <- function(input_file = NULL,
                             convert_all_slices = FALSE,
@@ -23,7 +25,8 @@ convertCziToTif <- function(input_file = NULL,
                             stack_method = "average",
                             higher_contrast_slices = FALSE,
                             higher_contrast_stack = TRUE,
-                            normalize_stack = TRUE) {
+                            normalize_stack = TRUE,
+                            change_layers = "none") {
   if(is.null(input_file)){
     print("Please call function with input file.")
     return()
@@ -47,6 +50,43 @@ convertCziToTif <- function(input_file = NULL,
     image_data <- drop(image_data)
   }
 
+  # Switch layers
+
+  if(change_layers != "none"){
+
+    change_layers <- tolower(change_layers)
+    change_layers <- gsub(pattern = " ", replacement = "", x = change_layers)
+    image_data_copy <- image_data
+
+    if(change_layers == "red<->green" || change_layers == "green<->red"){
+      if(dim_z > 1){
+        image_data[,,1,] <- image_data[,,2,]
+        image_data[,,2,] <- image_data_copy[,,1,]
+      }else{
+        image_data[,,1] <- image_data[,,2]
+        image_data[,,2] <- image_data_copy[,,1]
+      }
+    }else if(change_layers == "red<->blue" || change_layers == "blue<->red"){
+      if(dim_z > 1){
+        image_data[,,1,] <- image_data[,,3,]
+        image_data[,,3,] <- image_data_copy[,,1,]
+      }else{
+        image_data[,,1] <- image_data[,,3]
+        image_data[,,3] <- image_data_copy[,,1]
+      }
+    }else if(change_layers == "green<->blue" || change_layers == "blue<->green"){
+      if(dim_z > 1){
+        image_data[,,2,] <- image_data[,,3,]
+        image_data[,,3,] <- image_data_copy[,,2,]
+      }else{
+        image_data[,,2] <- image_data[,,3]
+        image_data[,,3] <- image_data_copy[,,2]
+      }
+    }
+    rm(image_data_copy)
+  }
+
+
   # Convert to EBImage
   Image_Data <- EBImage::Image(data = image_data, colormode = "Color")
 
@@ -62,12 +102,12 @@ convertCziToTif <- function(input_file = NULL,
   # Save z-stack or original image (with z=1) ------------------------------
   if(dim_z > 1 && stack_image){
     stack_method <- tolower(stack_method)
+    Image_Stack <- EBImage::Image(data = array(0, dim = dim(Image_Data)[1:3]), colormode = "Color")
 
     if(stack_method == "average" || stack_method ==  "mean"){
-      Image_Stack <- EBImage::Image(data = array(0, dim = dim(Image_Data)[1:3]), colormode = "Color")
 
       for(i in 1:dim(Image_Data)[3]){
-        Image_Stack[,,i] = apply(Image_Data[,,i,], c(1,2), mean)
+        Image_Stack[,,i] <- apply(Image_Data[,,i,], c(1,2), mean)
       }
 
       #Alternatives?
@@ -77,7 +117,11 @@ convertCziToTif <- function(input_file = NULL,
 
       #https://dahtah.github.io/imager/imager.html
 
-    }else if(stack_method == "max"){
+    }else if(stack_method == "maxprojection" || stack_method == "max"){
+
+      for(i in 1:dim(Image_Data)[3]){
+        Image_Stack[,,i] = apply(Image_Data[,,i,], c(1,2), max)
+      }
 
     }else if(stack_method == "addandnormalize"){
 

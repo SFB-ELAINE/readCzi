@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/05/13
+# Last changed: 2021/07/21
 
 
 # ATTENTION: It is better to use/import small(er) czi files. So please do
@@ -59,40 +59,61 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/AxioImager_Test.czi"
+#input_file <- "tests/AxioImager_Test.czi"
 #input_file <- "tests/Apotome_Test.czi"
 #input_file <- "tests/LSM_Test_twoChannels.czi"
 #input_file <- "tests/LSM_Test_threeChannels.czi"
 
+
+input_folder <-  "tests/detectCilia"
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 ### Test small functions ---------------------------------------------------
 
-# Test script for reading czi-file -----------------------------------------
-image_data <- readCzi(input_file <- input_file)
+# # Test script for reading czi-file -----------------------------------------
+# image_data <- readCzi(input_file <- input_file)
+#
+# # Test script for reading metadata of czi-file -----------------------------
+# df_metadata <- readCziMetadata(input_file <- input_file)
+#
+# # Test script for converting a czi file into a tif file --------------------
+# convertCziToTif(input_file <- input_file, convert_all_slices = FALSE)
 
-# Test script for reading metadata of czi-file -----------------------------
-df_metadata <- readCziMetadata(input_file <- input_file)
+# ### Test with files in folder ----------------------------------------------
+#
+# czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
+#
+# for(file_number in 1:length(czi_files)){
+#   convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE)
+#
+#   if(file_number == 1){
+#     df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
+#   }else{
+#     df_dummy <- readCziMetadata(input_file <- czi_files[file_number])
+#     df_metadata <- rbind(df_metadata, df_dummy)
+#   }
+# }
+#
+# save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
+# write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
 
-# Test script for converting a czi file into a tif file --------------------
-convertCziToTif(input_file <- input_file, convert_all_slices = FALSE)
-
-### Test with files in folder ----------------------------------------------
+### Convert cilia images from directory ------------------------------------
 
 czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
 
-for(i in 1:length(czi_files)){
-  convertCziToTif(input_file = czi_files[i], convert_all_slices = FALSE)
+for(file_number in 1:length(czi_files)){
+  convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE,
+                  stack_method = "maxprojection", change_layers = "red<->green")
 
-  if(i == 1){
-    df_metadata <- readCziMetadata(input_file <- czi_files[i])
+  if(file_number == 1){
+    df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
   }else{
-    df_dummy <- readCziMetadata(input_file <- czi_files[i])
+    df_dummy <- readCziMetadata(input_file <- czi_files[file_number])
     df_metadata <- rbind(df_metadata, df_dummy)
   }
 }
 
-save(df_metadata, file = paste(input_folder, "output/df_metadata.Rda", sep=""))
-write.csv2(x = df_metadata, file = paste(input_folder, "output/df_metadata_de.csv", sep=""))
+save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
+write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
 
 
