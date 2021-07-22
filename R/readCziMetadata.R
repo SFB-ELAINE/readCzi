@@ -105,15 +105,14 @@ readCziMetadata <- function(input_file = NULL) {
     objective_magnification <- NA
   }
 
-  # Scaling (in \mu m or m)
-  if(grepl(pattern = "scaling_x", x = metadata, ignore.case = TRUE)){
+  # Scaling (in m)
+  if(grepl(pattern = "scalingX", x = metadata, ignore.case = TRUE)){
     scaling_x <- gsub(pattern = ".+<ScalingX>(.+)</ScalingX>.+",
                       replacement = "\\1", x = metadata)
     scaling_x <- tolower(scaling_x)
     scaling_x <- as.numeric(scaling_x)
-    scaling_x <- scaling_x*1e6
   }else if(grepl(pattern = "<Distance Id=\"X\">", x = metadata, ignore.case = TRUE)){
-    scaling_x <- gsub(pattern = ".+<Distance Id=\"X\">.+<Value>(.{1,35})</Value>.+</Distance>.+",
+    scaling_x <- gsub(pattern = ".+<Distance Id=\"X\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
                       replacement = "\\1", x = metadata)
     scaling_x <- tolower(scaling_x)
     scaling_x <- as.numeric(scaling_x)
@@ -126,9 +125,8 @@ readCziMetadata <- function(input_file = NULL) {
                       replacement = "\\1", x = metadata)
     scaling_y <- tolower(scaling_y)
     scaling_y <- as.numeric(scaling_y)
-    scaling_y <- scaling_y*1e6
   }else if(grepl(pattern = "<Distance Id=\"Y\">", x = metadata, ignore.case = TRUE)){
-    scaling_y <- gsub(pattern = ".+<Distance Id=\"Y\">.+<Value>(.{1,35})</Value>.+</Distance>.+",
+    scaling_y <- gsub(pattern = ".+<Distance Id=\"Y\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
                       replacement = "\\1", x = metadata)
     scaling_y <- tolower(scaling_y)
     scaling_y <- as.numeric(scaling_y)
@@ -141,9 +139,8 @@ readCziMetadata <- function(input_file = NULL) {
                       replacement = "\\1", x = metadata)
     scaling_z <- tolower(scaling_z)
     scaling_z <- as.numeric(scaling_z)
-    scaling_z <- scaling_z*1e6
   }else if(grepl(pattern = "<Distance Id=\"Z\">", x = metadata, ignore.case = TRUE)){
-    scaling_z <- gsub(pattern = ".+<Distance Id=\"Z\">.+<Value>(.{1,35})</Value>.+</Distance>.+",
+    scaling_z <- gsub(pattern = ".+<Distance Id=\"Z\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
                       replacement = "\\1", x = metadata)
     scaling_z <- tolower(scaling_z)
     scaling_z <- as.numeric(scaling_z)
