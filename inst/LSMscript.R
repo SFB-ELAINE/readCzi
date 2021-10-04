@@ -1,7 +1,7 @@
-# Testscript for using the R package readCzi for development  ++++++++++++++
+# Script for working with LSM images  ++++++++++++++++++++++++++++++++++++++
 # Author: Kai Budde
-# Created: 2021/03/05
-# Last changed: 2021/09/09
+# Created: 2021/09/09
+# Last changed: 2021/09/30
 
 
 # ATTENTION: It is better to use/import small(er) czi files. So please do
@@ -16,7 +16,7 @@ graphics.off()
 
 # Load packages ############################################################
 
-list.of.packages <- c("BiocManager", "reticulate", "XML")
+list.of.packages <- c("BiocManager", "reticulate")
 #list.of.packages <- c("tiff", "dplyr", "devtools", "BiocManager", "xlsx", "zis", "reticulate")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
@@ -30,7 +30,6 @@ if(!("EBImage" %in% utils::installed.packages())){
 require(devtools)
 require(EBImage)
 require(reticulate)
-require(XML)
 
 #require(tiff)
 #require(dplyr)
@@ -53,51 +52,43 @@ reticulate::py_install("czifile")
 #check()
 
 # Document package
-document()
+#document()
 
 # Load package to use it
 load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#input_file <- "tests/AxioImager_Test.czi"
-#input_file <- "tests/Apotome_Test.czi"
-#input_file <- "tests/LSM_Test_twoChannels.czi"
-#input_file <- "tests/LSM_Test_threeChannels.czi"
-input_file <-  "tests/LSM_CellBiology.czi"
-
-#input_folder <-  "tests/detectCiliaNew"
-
+input_folder <-  "E:/LSM"
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 ### Test small functions ---------------------------------------------------
 
 # # Test script for reading czi-file -----------------------------------------
-image_data <- readCzi(input_file <- input_file)
+# image_data <- readCzi(input_file <- input_file)
 #
 # # Test script for reading metadata of czi-file -----------------------------
-df_metadata <- readCziMetadata(input_file <- input_file)
+#df_metadata <- readCziMetadata(input_file <- input_file)
 #
 # # Test script for converting a czi file into a tif file --------------------
 # convertCziToTif(input_file <- input_file, convert_all_slices = FALSE)
 
-# ### Test with files in folder ----------------------------------------------
-#
-# czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
-#
-# for(file_number in 1:length(czi_files)){
-#   convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE)
-#
-#   if(file_number == 1){
-#     df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
-#   }else{
-#     df_dummy <- readCziMetadata(input_file <- czi_files[file_number])
-#     df_metadata <- rbind(df_metadata, df_dummy)
-#   }
-# }
-#
-# save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
-# write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
+### Files in folder ----------------------------------------------
+czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
+
+for(file_number in 1:length(czi_files)){
+  convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE, stack_image = TRUE, stack_method = "average")
+
+  if(file_number == 1){
+    df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
+  }else{
+    df_dummy <- readCziMetadata(input_file <- czi_files[file_number])
+    df_metadata <- rbind(df_metadata, df_dummy)
+  }
+}
+
+save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
+write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
 
 ### Convert cilia images from directory ------------------------------------
 

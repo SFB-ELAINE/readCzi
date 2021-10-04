@@ -7,9 +7,11 @@
 #' @author Kai Budde
 #' @export readCziMetadata
 #' @param input_file A character (path to czi file to be read)
+#' @param save_metadata A boolean (save metadata as txt file if TRUE)
 #' @return A data frame with key information from the metadata is returned.
 
-readCziMetadata <- function(input_file = NULL) {
+readCziMetadata <- function(input_file = NULL,
+                            save_metadata = TRUE) {
 
   if(is.null(input_file)){
     print("Please call function with input file.")
@@ -26,13 +28,17 @@ readCziMetadata <- function(input_file = NULL) {
 
   czi_class <- zis$CziFile(input_file)
   metadata <- czi_class$metadata(czi_class)
+  metadata_XML <- xml2::read_xml(metadata)
+  metadata_XML <- xml2::as_list(x = metadata_XML)
 
   # Save metadata in txt file
-  utils::write.table(metadata, file = paste(directory_of_file, "/",
-                                            image_name_wo_czi,
-                                            "_metadata.txt", sep = ""),
-                     sep = "", row.names = FALSE,
-                     col.names = FALSE, quote = FALSE)
+  if(save_metadata){
+    utils::write.table(metadata, file = paste(directory_of_file, "/",
+                                              image_name_wo_czi,
+                                              "_metadata.txt", sep = ""),
+                       sep = "", row.names = FALSE,
+                       col.names = FALSE, quote = FALSE)
+  }
 
   # Save the dimension information
   # C: Channel in a Multi-Channel data set
@@ -63,23 +69,30 @@ readCziMetadata <- function(input_file = NULL) {
 
   # Main information is found below <Information>
 
-  # Microscope name
-  if(grepl(pattern = "<Microscopes>.+Name=.+</Microscopes>", x = metadata, ignore.case = TRUE)){
-    microscope_name <- gsub(pattern = ".+<Microscopes>.+<Microscope.+Name=\"(.+)\".+</Microscopes>.+",
-                            replacement = "\\1", x = metadata)
+  # Microscope system
+  if(grepl(pattern = "Microscopes", x = metadata_XML)){
+    microscopy_system <- unlist(metadata_XML$ImageDocument$Metadata$Information$Instrument$Microscopes$Microscope$System)
   }else{
-    microscope_name <- NA
+    microscopy_system <- NA
   }
 
-  # Acquisition start time
-  if(grepl(pattern = "<StartTime>", x = metadata, ignore.case = TRUE)){
-    acquisition_time <- gsub(pattern = ".+<StartTime>(.+)</StartTime>.+",
-                       replacement = "\\1", x = metadata)
+  # if(grepl(pattern = "<Microscopes>.+Name=.+</Microscopes>", x = metadata, ignore.case = TRUE)){
+  #   microscopy_system <- gsub(pattern = ".+<Microscopes>.+<Microscope.+Name=\"(.+)\".+</Microscopes>.+",
+  #                           replacement = "\\1", x = metadata)
+  # }else if(grepl(pattern = "<Microscopes>.+System.+</Microscopes>", x = metadata, ignore.case = TRUE)){
+  #   microscopy_system <- gsub(pattern = ".+<Microscopes>.+<System>(.+)</System>.+</Microscopes>.+",
+  #                           replacement = "\\1", x = metadata)
+  # }else{
+  #   microscopy_system <- NA
+  # }
 
+  # Acquisition start time
+  if(grepl(pattern = "CreationDate", x = metadata_XML)){
+    acquisition_time <- unlist(metadata_XML$ImageDocument$Metadata$Information$Document$CreationDate)
     acquisition_date <- gsub(pattern = "(.+)T.+",
                              replacement = "\\1",
                              x = acquisition_time)
-    acquisition_time <- gsub(pattern = ".+T(.+)Z",
+    acquisition_time <- gsub(pattern = ".+T(.+)",
                              replacement = "\\1",
                              x = acquisition_time)
   }else{
@@ -87,23 +100,50 @@ readCziMetadata <- function(input_file = NULL) {
     acquisition_time <- NA
   }
 
-  # Device Mode (LSM only)
-  if(grepl(pattern = "<System>", x = metadata, ignore.case = TRUE)){
-    microscopy_system <- gsub(pattern = ".+<System>(.+)</System.+",
-                              replacement = "\\1", x = metadata)
-  }else{
-    microscopy_system <- NA
-  }
+  # if(grepl(pattern = "<CreationDate>", x = metadata, ignore.case = TRUE)){
+  #   acquisition_time <- gsub(pattern = ".+<CreationDate>(.+)</CreationDate>.+",
+  #                      replacement = "\\1", x = metadata)
+  #
+  #   acquisition_date <- gsub(pattern = "(.+)T.+",
+  #                            replacement = "\\1",
+  #                            x = acquisition_time)
+  #   acquisition_time <- gsub(pattern = ".+T(.+)",
+  #                            replacement = "\\1",
+  #                            x = acquisition_time)
+  # }else{
+  #   acquisition_date <- NA
+  #   acquisition_time <- NA
+  # }
 
   # Image information ######################################################
 
+  # Objective
+  if(grepl(pattern = "Objectives", x = metadata_XML)){
+    objective <- unlist(metadata_XML$ImageDocument$Metadata$Information$Instrument$Objectives$Objective$Manufacturer$Model)
+  }else{
+    objective <- NA
+  }
+
+  # if(grepl(pattern = "<Objectives>", x = metadata, ignore.case = TRUE)){
+  #   objective <- gsub(pattern = ".+<Objectives>.+<Model>(.+)</Model>.+</Objectives>.+",
+  #                                   replacement = "\\1", x = metadata)
+  # }else{
+  #   objective <- NA
+  # }
+
   # Magnification of objective
-  if(grepl(pattern = "<NominalMagnification>", x = metadata, ignore.case = TRUE)){
-    objective_magnification <- gsub(pattern = ".+<NominalMagnification>(.+)</NominalMagnification>.+",
-                                    replacement = "\\1", x = metadata)
+  if(grepl(pattern = "NominalMagnification", x = metadata_XML)){
+    objective_magnification <- unlist(metadata_XML$ImageDocument$Metadata$Information$Instrument$Objectives$Objective$NominalMagnification)
   }else{
     objective_magnification <- NA
   }
+
+  # if(grepl(pattern = "<NominalMagnification>", x = metadata, ignore.case = TRUE)){
+  #   objective_magnification <- gsub(pattern = ".+<NominalMagnification>(.+)</NominalMagnification>.+",
+  #                                   replacement = "\\1", x = metadata)
+  # }else{
+  #   objective_magnification <- NA
+  # }
 
   # Scaling (in m)
   if(grepl(pattern = "scalingX", x = metadata, ignore.case = TRUE)){
@@ -150,40 +190,72 @@ readCziMetadata <- function(input_file = NULL) {
 
 
   # Image dimensions
-  dim_x <- gsub(pattern = ".+<SizeX>(.+)</SizeX>.+",
-                replacement = "\\1", x = metadata)
-  dim_x <- tolower(dim_x)
-  dim_x <- as.numeric(dim_x)
 
-  dim_y <- gsub(pattern = ".+<SizeY>(.+)</SizeY>.+",
-                replacement = "\\1", x = metadata)
-  dim_y <- tolower(dim_y)
-  dim_y <- as.numeric(dim_y)
-
-  if(grepl(pattern = "SizeZ", x = metadata, ignore.case = TRUE)){
-    dim_z <- gsub(pattern = ".+<SizeZ>(.+)</SizeZ>.+",
-                  replacement = "\\1", x = metadata)
-    dim_z <- tolower(dim_z)
+  if(grepl(pattern = "SizeX", x = metadata_XML)){
+    dim_x <- unlist(metadata_XML$ImageDocument$Metadata$Information$Image$SizeX)
+    dim_x <- as.numeric(dim_x)
+  }else{
+    dim_x <- NA
+  }
+  if(grepl(pattern = "SizeY", x = metadata_XML)){
+    dim_y <- unlist(metadata_XML$ImageDocument$Metadata$Information$Image$SizeY)
+    dim_y <- as.numeric(dim_y)
+  }else{
+    dim_y <- NA
+  }
+  if(grepl(pattern = "SizeZ", x = metadata_XML)){
+    dim_z <- unlist(metadata_XML$ImageDocument$Metadata$Information$Image$SizeZ)
     dim_z <- as.numeric(dim_z)
   }else{
-    dim_z <- 1
+    dim_z <- NA
   }
-
-  if(grepl(pattern = "SizeC", x = metadata, ignore.case = TRUE)){
-    number_of_channels <- gsub(pattern = ".+<SizeC>(.+)</SizeC>.+",
-                               replacement = "\\1", x = metadata)
-    number_of_channels <- tolower(number_of_channels)
+  if(grepl(pattern = "SizeC", x = metadata_XML)){
+    number_of_channels <- unlist(metadata_XML$ImageDocument$Metadata$Information$Image$SizeC)
     number_of_channels <- as.numeric(number_of_channels)
   }else{
     number_of_channels <- 1
   }
 
-  if(grepl(pattern = "<PixelType>", x = metadata, ignore.case = TRUE)){
-    pixel_type <- gsub(pattern = ".+<PixelType>(.+)</PixelType>.+",
-                       replacement = "\\1", x = metadata)
+  # dim_x <- gsub(pattern = ".+<SizeX>(.+)</SizeX>.+",
+  #               replacement = "\\1", x = metadata)
+  # dim_x <- tolower(dim_x)
+  # dim_x <- as.numeric(dim_x)
+  #
+  # dim_y <- gsub(pattern = ".+<SizeY>(.+)</SizeY>.+",
+  #               replacement = "\\1", x = metadata)
+  # dim_y <- tolower(dim_y)
+  # dim_y <- as.numeric(dim_y)
+  #
+  # if(grepl(pattern = "SizeZ", x = metadata, ignore.case = TRUE)){
+  #   dim_z <- gsub(pattern = ".+<SizeZ>(.+)</SizeZ>.+",
+  #                 replacement = "\\1", x = metadata)
+  #   dim_z <- tolower(dim_z)
+  #   dim_z <- as.numeric(dim_z)
+  # }else{
+  #   dim_z <- 1
+  # }
+  #
+  # if(grepl(pattern = "SizeC", x = metadata, ignore.case = TRUE)){
+  #   number_of_channels <- gsub(pattern = ".+<SizeC>(.+)</SizeC>.+",
+  #                              replacement = "\\1", x = metadata)
+  #   number_of_channels <- tolower(number_of_channels)
+  #   number_of_channels <- as.numeric(number_of_channels)
+  # }else{
+  #   number_of_channels <- 1
+  # }
+
+  if(grepl(pattern = "PixelType", x = metadata_XML)){
+    pixel_type <- unlist(metadata_XML$ImageDocument$Metadata$Information$Image$PixelType)
   }else{
     pixel_type <- NA
   }
+
+  # if(grepl(pattern = "<PixelType>", x = metadata, ignore.case = TRUE)){
+  #   pixel_type <- gsub(pattern = ".+<PixelType>(.+)</PixelType>.+",
+  #                      replacement = "\\1", x = metadata)
+  # }else{
+  #   pixel_type <- NA
+  # }
 
   if(tolower(pixel_type) == "bgr24"){
     color_axis <- "0"
@@ -197,13 +269,16 @@ readCziMetadata <- function(input_file = NULL) {
   if(color_axis == "0"){
     # Type of microscope: AxioImager
     df_metadata <- readCziMetadata_AxioImager(metadata)
+    # Type of microscope: LSM (in wide field acquisition mode)
   }else if(color_axis == "C" &&
-           grepl(pattern = "<AcquisitionMode>WideField</AcquisitionMode>",
-                 x = metadata, ignore.case = TRUE)){
+           #grepl(pattern = "<AcquisitionMode>WideField</AcquisitionMode>",x = metadata, ignore.case = TRUE)
+           grepl(pattern = "WideField", x = metadata_XML)){
     df_metadata <- readCziMetadata_Apotome(metadata, number_of_channels)
-  }else if(color_axis == "C" &&
-           grepl(pattern = "<AcquisitionMode>LaserScanningConfocalMicroscopy</AcquisitionMode>",
-                 x = metadata, ignore.case = TRUE)){
+
+    # Type of microscope: LSM (in confocal acquisition mode)
+    }else if(color_axis == "C" &&
+             #grepl(pattern = "<AcquisitionMode>LaserScanningConfocalMicroscopy</AcquisitionMode>",x = metadata, ignore.case = TRUE)
+             grepl(pattern = "LaserScanningConfocalMicroscopy", x = metadata_XML)){
     df_metadata <- readCziMetadata_LSM(metadata, number_of_channels)
   }else{
     print("Microscope could not be identified.")
@@ -214,10 +289,10 @@ readCziMetadata <- function(input_file = NULL) {
   df_metadata$fileName <- file_name
   df_metadata$acquisition_date <- acquisition_date
   df_metadata$acquisition_time <- acquisition_time
-  df_metadata$microscope_name <- microscope_name
   df_metadata$microscopy_system <- microscopy_system
   df_metadata$color_system <- ifelse(color_axis == "0", "RGBA", "Channels")
   df_metadata$number_of_channels <- number_of_channels
+  df_metadata$objective <- objective
   df_metadata$objective_magnification <- objective_magnification
   df_metadata$dim_x <- dim_x
   df_metadata$dim_y <- dim_y

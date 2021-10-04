@@ -30,6 +30,11 @@ readCzi <- function(input_file = NULL) {
   # Load image directly from czi
   image_loaded <- zis$imread(input_file)
 
+  # Load metadata
+  df_metadata <- readCziMetadata(input_file = input_file,
+                                 save_metadata = FALSE)
+  metadata <- czi_class$metadata(czi_class)
+
   # Save bit depth of the image --------------------------------------------
   czi_class <- zis$CziFile(input_file)
 
@@ -42,8 +47,6 @@ readCzi <- function(input_file = NULL) {
     print(paste("Something went wrong with the bit depth.", sep=""))
     return()
   }
-
-  metadata <- czi_class$metadata(czi_class)
 
   # ComponentBitCount -> shows the number of bits the camera can record
   # (is 0 or not specified if it is the same as dtype)
