@@ -8,7 +8,7 @@
 #' @export readCzi
 #' @param input_file A character (path to czi file to be converted)
 #' @return A multidimensional array with the following dimensions:
-#' \code(x, y, c, z) with the channels \code{c}.
+#' \code{(x, y, c, z)} with the channels \code{c}.
 
 readCzi <- function(input_file = NULL) {
 

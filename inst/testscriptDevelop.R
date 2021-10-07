@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/09/09
+# Last changed: 2021/10/07
 
 
 # ATTENTION: It is better to use/import small(er) czi files. So please do
@@ -60,11 +60,11 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#input_file <- "tests/AxioImager_Test.czi"
+input_file <- "tests/AxioImager_Test.czi"
 #input_file <- "tests/Apotome_Test.czi"
 #input_file <- "tests/LSM_Test_twoChannels.czi"
 #input_file <- "tests/LSM_Test_threeChannels.czi"
-input_file <-  "tests/LSM_CellBiology.czi"
+#input_file <-  "tests/LSM_CellBiology.czi"
 
 #input_folder <-  "tests/detectCiliaNew"
 
@@ -73,7 +73,7 @@ input_file <-  "tests/LSM_CellBiology.czi"
 ### Test small functions ---------------------------------------------------
 
 # # Test script for reading czi-file -----------------------------------------
-image_data <- readCzi(input_file <- input_file)
+#image_data <- readCzi(input_file <- input_file)
 #
 # # Test script for reading metadata of czi-file -----------------------------
 df_metadata <- readCziMetadata(input_file <- input_file)

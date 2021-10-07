@@ -7,10 +7,12 @@
 \alias{readCZIMetadata}
 \title{readCziMetadata}
 \usage{
-readCziMetadata(input_file = NULL)
+readCziMetadata(input_file = NULL, save_metadata = TRUE)
 }
 \arguments{
 \item{input_file}{A character (path to czi file to be read)}
+
+\item{save_metadata}{A boolean (save metadata as txt file if TRUE)}
 }
 \value{
 A data frame with key information from the metadata is returned.

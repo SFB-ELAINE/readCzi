@@ -4,10 +4,15 @@
 \alias{readCziMetadata_AxioImager}
 \title{Check for specific values in metadata for all other microscope types}
 \usage{
-readCziMetadata_AxioImager(metadata = metadata)
+readCziMetadata_AxioImager(
+  metadata = metadata,
+  number_of_channels = number_of_channels
+)
 }
 \arguments{
 \item{metadata}{A character (loaded metadata in a string)}
+
+\item{number_of_channels}{A number}
 }
 \description{
 Check for specific values in metadata for all other microscope types

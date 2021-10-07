@@ -13,7 +13,7 @@ readCzi(input_file = NULL)
 }
 \value{
 A multidimensional array with the following dimensions:
-\code(x, y, c, z) with the channels \code{c}.
+\code{(x, y, c, z)} with the channels \code{c}.
 }
 \description{
 Imports czi files
