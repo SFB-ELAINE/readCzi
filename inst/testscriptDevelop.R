@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/10/07
+# Last changed: 2021/10/08
 
 
 # ATTENTION: It is better to use/import small(er) czi files. So please do
@@ -60,26 +60,33 @@ load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/AxioImager_Test.czi"
-#input_file <- "tests/Apotome_Test.czi"
-#input_file <- "tests/LSM_Test_twoChannels.czi"
-#input_file <- "tests/LSM_Test_threeChannels.czi"
-#input_file <-  "tests/LSM_CellBiology.czi"
+#input_file <- "examples/AxioImager_Test.czi"
+#input_file <- "examples/Apotome_Test.czi"
+#input_file <- "examples/LSM_twoChannels.czi"
+#input_file <- "examples/LSM_threeChannels.czi"
+#input_file <- "examples/LSM_CellBiology.czi"
 
-#input_folder <-  "tests/detectCiliaNew"
+#input_folder <-  "examples/detectCiliaNew"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 ### Test small functions ---------------------------------------------------
 
-# # Test script for reading czi-file -----------------------------------------
-#image_data <- readCzi(input_file <- input_file)
-#
-# # Test script for reading metadata of czi-file -----------------------------
-df_metadata <- readCziMetadata(input_file <- input_file)
-#
-# # Test script for converting a czi file into a tif file --------------------
-# convertCziToTif(input_file <- input_file, convert_all_slices = FALSE)
+# Test script for reading czi-file -----------------------------------------
+#image_data <- readCzi(input_file = input_file)
+
+# Test script for reading metadata of czi-file -----------------------------
+df_metadata <- readCziMetadata(input_file = input_file)
+directory_of_file <- dirname(input_file)
+dir.create(paste(directory_of_file, "/output", sep=""), showWarnings = FALSE)
+file_name <- gsub(pattern = "\\.czi", replacement = "", x = basename(input_file))
+write.csv2(x = df_metadata, file = paste(directory_of_file, "/output/", file_name, "_df_metadata_de.csv", sep=""),
+           row.names=FALSE)
+write.csv(x = df_metadata, file = paste(directory_of_file, "/output/", file_name, "_df_metadata_en.csv", sep=""),
+           row.names=FALSE)
+
+# Test script for converting a czi file into a tif file --------------------
+convertCziToTif(input_file = input_file)
 
 # ### Test with files in folder ----------------------------------------------
 #
@@ -117,5 +124,4 @@ for(file_number in 1:length(czi_files)){
 
 save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
 write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
-
 

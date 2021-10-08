@@ -1,6 +1,8 @@
 # Custom files/directories
-/tests
 readCzi.Rproj
+/examples/*metadata.txt
+/examples/output
+/examples/output_compare
 
 # History files
 .Rhistory

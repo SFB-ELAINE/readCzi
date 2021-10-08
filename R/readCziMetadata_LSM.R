@@ -11,8 +11,10 @@ readCziMetadata_LSM <- function(metadata = metadata,
   # Get information of laser scanning microscopes ##########################
 
   # Channel names
-  channel_information <- look_for <- paste(".//Channel[@Name='",channel_names[current_channel], "']/Fluor", sep="")
+  look_for <- paste(".//Channel", sep="")
+  channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
   channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+
   if(number_of_channels != length(channel_names)){
     print("The number of channels does not correspond to the number of channel names in the metadata.")
   }
@@ -147,7 +149,8 @@ readCziMetadata_LSM <- function(metadata = metadata,
       laser_name[i] <- unlist(experiment_information[[1]]$ExperimentBlocks$AcquisitionBlock$Lasers[i]$Laser$LaserName)
     }
     if(grepl(pattern = "LaserPower", x = experiment_information, ignore.case = TRUE)){
-      laser_power[i] <- unlist(experiment_information[[1]]$ExperimentBlocks$AcquisitionBlock$Lasers[i]$Laser$LaserPower)
+      laser_power[i] <- as.numeric(unlist(
+        experiment_information[[1]]$ExperimentBlocks$AcquisitionBlock$Lasers[i]$Laser$LaserPower))
     }
 
     look_for <- paste(".//Attenuators/Attenuator[Laser='", laser_name[i], "']", sep="")
@@ -181,637 +184,57 @@ readCziMetadata_LSM <- function(metadata = metadata,
     laser_transmission[i] <- laser_transmission_copy[experiment_order[i]]
   }
 
-  # for(current_channel in 0:(number_of_channels-1)){
-  #
-  #   if(grepl(pattern = "Channel", x = metadata_XML)){
-  #     averaging_1 <- metadata_XML$Metadata$Information$Instrument$Objectives$Objective$Manufacturer$Model
-  #   }else{
-  #     averaging_1 <- NA
-  #   }
-  #
-  #   channel_name_1 <- gsub(
-  #         pattern = paste(rep(".+<Channel [[:print:]]+ Name=\"([[:print:]]+)\">.+",number_of_channels), collapse=""),
-  #         replacement = paste("\\", 1:3, sep="", collapse=","),
-  #         x = metadata)
-  #
-  #   channel_names <- unlist(strsplit(x = channel_names, split = ","))
-  #
-  #   metadata_block <- sub(
-  #     pattern = paste(".+<Channel [[:print:]]+ Name=\"",
-  #                     channel_names[current_channel],
-  #                     "\">(.+)</Channel>?.+", sep=""),
-  #     replacement = "\\1", x = metadata)
-  #
-  #
-  #   metadata_block <- gsub(
-  #     pattern = ".+(<LightSource Id=\"LightSource:0\" />.+)</LightSourceSettings>.+(<LightSourceSettings>)*?.+", replacement = "\\1", x = metadata)
-  # }
-  # rm(current_channel)
-  #
-  #
-  # # Channel-specific information
-  #
-  # # averaging and mode of acquisition
-  # if(grepl(pattern = "Averaging", x = metadata_XML)){
-  #   averaging_1 <- metadata_XML$Metadata$Information$Instrument$Objectives$Objective$Manufacturer$Model
-  # }else{
-  #   averaging_1 <- NA
-  # }
-  #
-  #
-  # if (grepl(pattern = "<Averaging>",
-  #           x = metadata,
-  #           ignore.case = TRUE)) {
-  #   averaging <- gsub(pattern = ".+<Averaging>(.+)</Averaging>.+",
-  #                     replacement = "\\1",
-  #                     x = metadata)
-  # } else{
-  #   averaging <- NA
-  # }
-  # if (grepl(pattern = "<ScanningMode>",
-  #           x = metadata,
-  #           ignore.case = TRUE)) {
-  #   scanning_mode <-
-  #     gsub(pattern = ".+<ScanningMode>(.+)</ScanningMode>.+",
-  #          replacement = "\\1",
-  #          x = metadata)
-  # } else{
-  #   scanning_mode <- NA
-  # }
-  #
-  # # Get information depending on number of channels
-  #
-  # if (number_of_channels == 3) {
-  #
-  #   fluor <- gsub(
-  #     pattern =  paste(
-  #       ".+<Fluor>(.+)</Fluor>.+",
-  #       ".+<Fluor>(.+)</Fluor>.+",
-  #       ".+<Fluor>(.+)</Fluor>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata
-  #   )
-  #
-  #   detection_wavelength_start <- gsub(
-  #     pattern =  paste(
-  #       ".+<Ranges>(.+)-.+</Ranges>.+",
-  #       ".+<Ranges>(.+)-.+</Ranges>.+",
-  #       ".+<Ranges>(.+)-.+</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata
-  #   )
-  #
-  #   detection_wavelength_end <- gsub(
-  #     pattern =  paste(
-  #       ".+<Ranges>.+-(.+)</Ranges>.+",
-  #       ".+<Ranges>.+-(.+)</Ranges>.+",
-  #       ".+<Ranges>.+-(.+)</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata
-  #   )
-  #
-  #   laser_wavelength <- gsub(
-  #     pattern =  paste(
-  #       ".+<Attenuator>.+<Wavelength>(.+)</Wavelength>.+</Attenuator>.+",
-  #       ".+<Attenuator>.+<Wavelength>(.+)</Wavelength>.+</Attenuator>.+",
-  #       ".+<Attenuator>.+<Wavelength>(.+)</Wavelength>.+</Attenuator>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata
-  #   )
-  #
-  #   laser_name <- gsub(
-  #     pattern = paste(
-  #       ".+<Attenuator>.+<Laser>(.+)</Laser>.+</Attenuator>.+",
-  #       ".+<Attenuator>.+<Laser>(.+)</Laser>.+</Attenuator>.+",
-  #       ".+<Attenuator>.+<Laser>(.+)</Laser>.+</Attenuator>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #
-  #   laser_name_2 <- gsub(
-  #     pattern = paste(
-  #       ".+<LaserName>(.+)</LaserName>.+",
-  #       ".+<LaserName>(.+)</LaserName>.+",
-  #       ".+<LaserName>(.+)</LaserName>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   # Light source 0 (=laser_name_2[1])
-  #   metadata_cropped <- gsub(pattern = ".+(<LightSource Id=\"LightSource:0\" />.+)</LightSourceSettings>.+(<LightSourceSettings>)*?.+", replacement = "\\1", x = metadata)
-  #
-  #   # Light source 1 (=laser_name_2[2])
-  #   # Light source 2 (=laser_name_2[3])
-  #   laser_power <-  gsub(
-  #     pattern = paste(
-  #       ".+<LaserPower>(.+)</LaserPower>.+",
-  #       ".+<LaserPower>(.+)</LaserPower>.+",
-  #       ".+<LaserPower>(.+)</LaserPower>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   laser_attenuation <-  gsub(
-  #     pattern = paste(
-  #       ".+<Attenuation>(.+)</Attenuation>.+",
-  #       ".+<Attenuation>(.+)</Attenuation>.+",
-  #       ".+<Attenuation>(.+)</Attenuation>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   laser_transmission <-  gsub(
-  #     pattern = paste(
-  #       ".+<Transmission>(.+)</Transmission>.+",
-  #       ".+<Transmission>(.+)</Transmission>.+",
-  #       ".+<Transmission>(.+)</Transmission>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   for(max_index in 3:1){
-  #     pattern <- paste(rep(".+<EmissionWavelength>(.+)</EmissionWavelength>.+", max_index), collapse = "")
-  #
-  #     if(grepl(pattern = pattern, x = metadata, ignore.case = TRUE, )){
-  #       break
-  #     }
-  #   }
-  #
-  #   if(max_index == 3){
-  #     emission_wavelengths <- gsub(
-  #       pattern =  paste(
-  #         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #         sep = ""
-  #       ),
-  #       replacement = "\\1,\\2,\\3",
-  #       x = metadata
-  #     )
-  #   }else if(max_index == 2){
-  #     emission_wavelengths <- gsub(
-  #       pattern =  paste(
-  #         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #         sep = ""
-  #       ),
-  #       replacement = "\\1,\\2",
-  #       x = metadata
-  #     )
-  #   }
-  #
-  #
-  #
-  #   # Detector
-  #
-  #   # Pixel time in \mu s
-  #   pixel_time <-
-  #     gsub(
-  #       pattern = paste(
-  #         ".+<PixelTime>(.+)</PixelTime>.+",
-  #         ".+<PixelTime>(.+)</PixelTime>.+",
-  #         ".+<PixelTime>(.+)</PixelTime>.+",
-  #         sep = ""
-  #       ),
-  #       replacement = "\\1, \\2, \\3",
-  #       x = metadata
-  #     )
-  #
-  #   photon_conversion_factor <- gsub(
-  #     pattern = paste(
-  #       ".+<PhotonConversionFactor>(.+)</PhotonConversionFactor>.+",
-  #       ".+<PhotonConversionFactor>(.+)</PhotonConversionFactor>.+",
-  #       ".+<PhotonConversionFactor>(.+)</PhotonConversionFactor>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   detector_gain <- gsub(
-  #     pattern = paste(
-  #       ".+<Voltage>(.+)</Voltage>.+",
-  #       ".+<Voltage>(.+)</Voltage>.+",
-  #       ".+<Voltage>(.+)</Voltage>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   digital_gain <- gsub(
-  #     pattern = paste(
-  #       ".+<AmplifierGain>(.+)</AmplifierGain>.+",
-  #       ".+<AmplifierGain>(.+)</AmplifierGain>.+",
-  #       ".+<AmplifierGain>(.+)</AmplifierGain>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   amplifier_offset <- gsub(
-  #     pattern = paste(
-  #       ".+<AmplifierOffset>(.+)</AmplifierOffset>.+",
-  #       ".+<AmplifierOffset>(.+)</AmplifierOffset>.+",
-  #       ".+<AmplifierOffset>(.+)</AmplifierOffset>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   # pinhole diameter in \mu m
-  #   pinhole_diameter <- gsub(
-  #     pattern = paste(
-  #       ".+<PinholeDiameter>(.+)</PinholeDiameter>.+",
-  #       ".+<PinholeDiameter>(.+)</PinholeDiameter>.+",
-  #       ".+<PinholeDiameter>(.+)</PinholeDiameter>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  #   detection_range_wavelength <- gsub(
-  #     pattern = paste(
-  #       ".+<Ranges>(.+)</Ranges>.+",
-  #       ".+<Ranges>(.+)</Ranges>.+",
-  #       ".+<Ranges>(.+)</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2, \\3",
-  #     x = metadata
-  #   )
-  #
-  # } else if (number_of_channels == 2) {
-  #
-  #   fluor <- gsub(
-  #     pattern =  paste(
-  #       ".+<Fluor>(.+)</Fluor>.+",
-  #       ".+<Fluor>(.+)</Fluor>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2",
-  #     x = metadata
-  #   )
-  #
-  #   detection_wavelength_start <- gsub(
-  #     pattern =  paste(
-  #       ".+<Ranges>(.+)-.+</Ranges>.+",
-  #       ".+<Ranges>(.+)-.+</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2",
-  #     x = metadata
-  #   )
-  #
-  #   detection_wavelength_end <- gsub(
-  #     pattern =  paste(
-  #       ".+<Ranges>.+-(.+)</Ranges>.+",
-  #       ".+<Ranges>.+-(.+)</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2",
-  #     x = metadata
-  #   )
-  #
-  #   laser_wavelength <- gsub(
-  #     pattern =  paste(
-  #       ".+<Attenuator>.+<Wavelength>(.+)</Wavelength>.+</Attenuator>.+",
-  #       ".+<Attenuator>.+<Wavelength>(.+)</Wavelength>.+</Attenuator>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2",
-  #     x = metadata
-  #   )
-  #
-  #   emission_wavelengths <- gsub(
-  #     pattern =  paste(
-  #       ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #       ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1,\\2",
-  #     x = metadata
-  #   )
-  #
-  #   laser_name <- gsub(
-  #     pattern = paste(
-  #       ".+<LaserName>(.+)</LaserName>.+",
-  #       ".+<LaserName>(.+)</LaserName>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   laser_power <-  gsub(
-  #     pattern = paste(
-  #       ".+<LaserPower>(.+)</LaserPower>.+",
-  #       ".+<LaserPower>(.+)</LaserPower>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   laser_attenuation <-  gsub(
-  #     pattern = paste(
-  #       ".+<Attenuation>(.+)</Attenuation>.+",
-  #       ".+<Attenuation>(.+)</Attenuation>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   laser_transmission <-  gsub(
-  #     pattern = paste(
-  #       ".+<Transmission>(.+)</Transmission>.+",
-  #       ".+<Transmission>(.+)</Transmission>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   # Detector
-  #
-  #   # Pixel time in \mu s
-  #   pixel_time <- gsub(
-  #     pattern = paste(
-  #       ".+<PixelTime>(.+)</PixelTime>.+",
-  #       ".+<PixelTime>(.+)</PixelTime>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   photon_conversion_factor <-
-  #     gsub(
-  #       pattern = paste(
-  #         ".+<PhotonConversionFactor>(.+)</PhotonConversionFactor>.+",
-  #         ".+<PhotonConversionFactor>(.+)</PhotonConversionFactor>.+",
-  #         sep = ""
-  #       ),
-  #       replacement = "\\1, \\2",
-  #       x = metadata
-  #     )
-  #
-  #   detector_gain <- gsub(
-  #     pattern = paste(
-  #       ".+<Voltage>(.+)</Voltage>.+",
-  #       ".+<Voltage>(.+)</Voltage>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   digital_gain <- gsub(
-  #     pattern = paste(
-  #       ".+<AmplifierGain>(.+)</AmplifierGain>.+",
-  #       ".+<AmplifierGain>(.+)</AmplifierGain>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   amplifier_offset <- gsub(
-  #     pattern = paste(
-  #       ".+<AmplifierOffset>(.+)</AmplifierOffset>.+",
-  #       ".+<AmplifierOffset>(.+)</AmplifierOffset>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   # pinhole diameter in \mu m
-  #   pinhole_diameter <- gsub(
-  #     pattern = paste(
-  #       ".+<PinholeDiameter>(.+)</PinholeDiameter>.+",
-  #       ".+<PinholeDiameter>(.+)</PinholeDiameter>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  #   detection_range_wavelength <- gsub(
-  #     pattern = paste(
-  #       ".+<Ranges>(.+)</Ranges>.+",
-  #       ".+<Ranges>(.+)</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1, \\2",
-  #     x = metadata
-  #   )
-  #
-  # } else if (number_of_channels == 1) {
-  #
-  #   fluor <- gsub(
-  #     pattern =  paste(
-  #       ".+<Fluor>(.+)</Fluor>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   detection_wavelength_start <- gsub(
-  #     pattern =  paste(
-  #       ".+<Ranges>(.+)-.+</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   detection_wavelength_end <- gsub(
-  #     pattern =  paste(
-  #       ".+<Ranges>.+-(.+)</Ranges>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   laser_wavelength <- gsub(
-  #     pattern =  paste(
-  #       ".+<Attenuator>.+<Wavelength>(.+)</Wavelength>.+</Attenuator>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   emission_wavelengths <- gsub(
-  #     pattern =  paste(
-  #       ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   laser_name <- gsub(
-  #     pattern = paste(
-  #       ".+<LaserName>(.+)</LaserName>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   laser_power <-  gsub(
-  #     pattern = paste(".+<LaserPower>(.+)</LaserPower>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   laser_attenuation <-  gsub(
-  #     pattern = paste(".+<Attenuation>(.+)</Attenuation>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   laser_transmission <-  gsub(
-  #     pattern = paste(".+<Transmission>(.+)</Transmission>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   # Detector
-  #
-  #   # Pixel time in \mu s
-  #   pixel_time <- gsub(
-  #     pattern = paste(".+<PixelTime>(.+)</PixelTime>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   photon_conversion_factor <- gsub(
-  #     pattern = paste(
-  #       ".+<PhotonConversionFactor>(.+)</PhotonConversionFactor>.+",
-  #       sep = ""
-  #     ),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   detector_gain <- gsub(
-  #     pattern = paste(".+<Voltage>(.+)</Voltage>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   digital_gain <- gsub(
-  #     pattern = paste(".+<AmplifierGain>(.+)</AmplifierGain>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   amplifier_offset <- gsub(
-  #     pattern = paste(".+<AmplifierOffset>(.+)</AmplifierOffset>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   # pinhole diameter in \mu m
-  #   pinhole_diameter <- gsub(
-  #     pattern = paste(".+<PinholeDiameter>(.+)</PinholeDiameter>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  #   detection_range_wavelength <- gsub(
-  #     pattern = paste(".+<Ranges>(.+)</Ranges>.+",
-  #                     sep = ""),
-  #     replacement = "\\1",
-  #     x = metadata
-  #   )
-  #
-  # }
-  #
-  # fluor <- unlist(strsplit(x = fluor, split = ","))
-  # fluor <- trimws(fluor)
-  # detection_wavelenght_start <- as.numeric(unlist(strsplit(detection_wavelenght_start, split = ",")))
-  # detection_wavelenght_end <- as.numeric(unlist(strsplit(detection_wavelenght_end, split = ",")))
-  #
-  # # Define sorting vector (in which order are the wavelengths of the channels)
-  # sorting_vector <- order(detection_wavelenght_start)
-  #
-  # laser_wavelength <- as.numeric(unlist(strsplit(laser_wavelength, split = ",")))
-  # emission_wavelengths <-
-  #   as.numeric(unlist(strsplit(emission_wavelengths, split = ",")))
-  # laser_name <- unlist(strsplit(x = laser_name, split = ","))
-  # laser_name <- trimws(laser_name)
-  # laser_name_2 <- unlist(strsplit(x = laser_name_2, split = ","))
-  # laser_name_2 <- trimws(laser_name_2)
-  # order_lasers <- match(laser_name, laser_name_2)
-  #
-  # laser_power <-
-  #   as.numeric(unlist(strsplit(x = laser_power, split = ",")))
-  # laser_power <- laser_power[order_lasers]
-  #
-  # laser_attenuation <-
-  #   as.numeric(unlist(strsplit(x = laser_attenuation, split = ",")))
-  # laser_transmission <-
-  #   as.numeric(unlist(strsplit(x = laser_transmission, split = ",")))
-  #
-  # pixel_time <-
-  #   as.numeric(unlist(strsplit(x = pixel_time, split = ",")))
-  # pixel_time <- pixel_time * 1e6
-  # photon_conversion_factor <-
-  #   as.numeric(unlist(strsplit(x = photon_conversion_factor, split = ",")))
-  # detector_gain <-
-  #   as.numeric(unlist(strsplit(x = detector_gain, split = ",")))
-  # digital_gain <-
-  #   as.numeric(unlist(strsplit(x = digital_gain, split = ",")))
-  # amplifier_offset <-
-  #   as.numeric(unlist(strsplit(x = amplifier_offset, split = ",")))
-  #
-  # pinhole_diameter <-
-  #   as.numeric(unlist(strsplit(x = pinhole_diameter, split = ",")))
-  # pinhole_diameter <- pinhole_diameter * 1e6
-  #
-  # detection_range_wavelength <-
-  #   unlist(strsplit(x = detection_range_wavelength, split = ","))
-  # detection_range_wavelength <-
-  #   unlist(strsplit(x = detection_range_wavelength, split = "-"))
-  # detection_range_wavelength <-
-  #   as.numeric(detection_range_wavelength)
+  # Finding the color of each channel and the corresponding chan number ----
+
+  # Upper and lower limits of emission wavelengths to determine the colors
+  red_limit <- 600 #>600nmnm
+  # green: #>= 500nm and <= 600nm
+  blue_limit <- 500 #< 500nm
+
+  if(number_of_channels == 3){
+    # 1: blue, 2: green, 3: red
+    channel_color <- channel_order
+  }else{
+
+    channel_color <- rep(NA, 3)
+
+    for(i in 1:number_of_channels){
+
+      if(!is.na(emission_wavelengths[i])){
+        if(emission_wavelengths[i] < blue_limit){
+          # Finding the blue channel
+          channel_color[1] <- channel_order[i]
+
+        }else if(emission_wavelengths[i] > red_limit){
+          # Finding the red channel
+          channel_color[3] <- channel_order[i]
+
+        }else{
+          # Finding the green channel
+          channel_color[2] <- channel_order[i]
+
+        }
+      }else{
+
+        if(detection_wavelength_start[i] < (blue_limit-50)){
+          # Finding the blue channel
+          channel_color[1] <- channel_order[i]
+
+        }else if(detection_wavelength_start[i] > (red_limit-50)){
+          # Finding the red channel
+          channel_color[3] <- channel_order[i]
+
+        }else{
+          # Finding the green channel
+          channel_color[2] <- channel_order[i]
+
+        }
+      }
+
+
+    }
+
+  }
 
   # Put information into a data frame
   df_metadata <- data.frame(
@@ -829,6 +252,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "scaling_x" = NA,
     "scaling_y" = NA,
     "scaling_z" = NA,
+    "blue_channel" = channel_color[1],
+    "green_channel" = channel_color[2],
+    "red_channel" = channel_color[3],
     "channel_name_1" = channel_names[1],
     "channel_name_2" = channel_names[2],
     "channel_name_3" = channel_names[3],

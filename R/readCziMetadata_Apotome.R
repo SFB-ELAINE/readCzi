@@ -64,8 +64,11 @@ readCziMetadata_Apotome <- function(metadata = metadata,
       illumination_wavelengths[i] <- as.numeric(unlist(channel_information[[1]]$IlluminationWavelength$SinglePeak))
     }
     if(grepl(pattern = "LightSourceSettings", x = channel_information, ignore.case = TRUE)){
-      light_source_intensitys[i] <- unlist(channel_information[[1]]$LightSourcesSettings$LightSourceSettings$Intensity)
-      light_source_intensitys[i] <- as.numeric(gsub(pattern = "\\%", replacement = "", x = light_source_intensitys[i]))
+      dump_light_source_intensitys <- unlist(channel_information[[1]]$LightSourcesSettings$LightSourceSettings$Intensity)
+      dump_light_source_intensitys <- gsub(pattern = "\\%", replacement = "", x = dump_light_source_intensitys)
+      dump_light_source_intensitys <- gsub(pattern = " ", replacement = "", x = dump_light_source_intensitys)
+      light_source_intensitys[i] <- as.numeric(dump_light_source_intensitys)
+      rm(dump_light_source_intensitys)
     }
 
   }
@@ -103,107 +106,6 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     contour_size_y <- NA
   }
 
-  # # Get information of Apotome (LED widefield) #############################
-  #
-  # # Get information depending on the number of channels
-  #
-  # if(number_of_channels == 3){
-  #
-  #   # LED widefield
-  #   excitation_wavelengths <- gsub(
-  #     pattern =  paste(".+<ExcitationWavelength>(.+)</ExcitationWavelength>.+",
-  #                      ".+<ExcitationWavelength>(.+)</ExcitationWavelength>.+",
-  #                      ".+<ExcitationWavelength>(.+)</ExcitationWavelength>.+",
-  #                      sep=""),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata)
-  #
-  #   emission_wavelengths <- gsub(
-  #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #                      sep=""),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata)
-  #
-  #   illumination_wavelengths <- gsub(
-  #     pattern =  paste(
-  #       ".+<IlluminationWavelength>.+<SinglePeak>(.+)</SinglePeak>.+</IlluminationWavelength>.+",
-  #       ".+<IlluminationWavelength>.+<SinglePeak>(.+)</SinglePeak>.+</IlluminationWavelength>.+",
-  #       ".+<IlluminationWavelength>.+<SinglePeak>(.+)</SinglePeak>.+</IlluminationWavelength>.+",
-  #       sep=""),
-  #     replacement = "\\1,\\2,\\3",
-  #     x = metadata)
-  #
-  #
-  #   light_source_intensitys <-  gsub(
-  #     pattern = paste(".+<Intensity>(.+)</Intensity>.+",
-  #                     ".+<Intensity>(.+)</Intensity>.+",
-  #                     ".+<Intensity>(.+)</Intensity>.+",
-  #                     sep=""),
-  #     replacement = "\\1, \\2, \\3", x = metadata)
-  #
-  # }else if(number_of_channels == 2){
-  #
-  #   # LED widefield
-  #   excitation_wavelengths <- gsub(
-  #     pattern =  paste(".+<ExcitationWavelength>(.+)</ExcitationWavelength>.+",
-  #                      ".+<ExcitationWavelength>(.+)</ExcitationWavelength>.+",
-  #                      sep=""),
-  #     replacement = "\\1,\\2",
-  #     x = metadata)
-  #
-  #   emission_wavelengths <- gsub(
-  #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #                      sep=""),
-  #     replacement = "\\1,\\2",
-  #     x = metadata)
-  #
-  #   illumination_wavelengths <- gsub(
-  #     pattern =  paste(
-  #       ".+<IlluminationWavelength>.+<SinglePeak>(.+)</SinglePeak>.+</IlluminationWavelength>.+",
-  #       ".+<IlluminationWavelength>.+<SinglePeak>(.+)</SinglePeak>.+</IlluminationWavelength>.+",
-  #       sep=""),
-  #     replacement = "\\1,\\2",
-  #     x = metadata)
-  #
-  #
-  #   light_source_intensitys <-  gsub(
-  #     pattern = paste(".+<Intensity>(.+)</Intensity>.+",
-  #                     ".+<Intensity>(.+)</Intensity>.+",
-  #                     sep=""),
-  #     replacement = "\\1, \\2", x = metadata)
-  #
-  # }else if(number_of_channels == 1){
-  #   # LED widefield
-  #   excitation_wavelengths <- gsub(
-  #     pattern =  paste(".+<ExcitationWavelength>(.+)</ExcitationWavelength>.+",
-  #                      sep=""),
-  #     replacement = "\\1",
-  #     x = metadata)
-  #
-  #   emission_wavelengths <- gsub(
-  #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-  #                      sep=""),
-  #     replacement = "\\1",
-  #     x = metadata)
-  #
-  #   illumination_wavelengths <- gsub(
-  #     pattern =  paste(
-  #       ".+<IlluminationWavelength>.+<SinglePeak>(.+)</SinglePeak>.+</IlluminationWavelength>.+",
-  #       sep=""),
-  #     replacement = "\\1",
-  #     x = metadata)
-  #
-  #
-  #   light_source_intensitys <-  gsub(
-  #     pattern = paste(".+<Intensity>(.+)</Intensity>.+",
-  #                     sep=""),
-  #     replacement = "\\1", x = metadata)
-  #
-  # }
-
   # Sorting the channels information regarding wavelength ------------------
   channel_order <- order(illumination_wavelengths)
 
@@ -226,6 +128,57 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     }
   }
 
+  # Finding the color of each channel and the corresponding chan number ----
+
+  # Upper and lower limits of emission wavelengths to determine the colors
+  red_limit <- 600 #>600nmnm
+  # green: #>= 500nm and <= 600nm
+  blue_limit <- 500 #< 500nm
+
+  if(number_of_channels == 3){
+    # 1: blue, 2: green, 3: red
+    channel_color <- channel_order
+  }else{
+
+    channel_color <- rep(NA, 3)
+
+    for(i in 1:number_of_channels){
+
+      if(!is.na(emission_wavelengths[i])){
+        if(emission_wavelengths[i] < blue_limit){
+          # Finding the blue channel
+          channel_color[1] <- channel_order[i]
+
+        }else if(emission_wavelengths[i] > red_limit){
+          # Finding the red channel
+          channel_color[3] <- channel_order[i]
+
+        }else{
+          # Finding the green channel
+          channel_color[2] <- channel_order[i]
+
+        }
+      }else{
+        if(illumination_wavelengths[i] < (blue_limit-50)){
+          # Finding the blue channel
+          channel_color[1] <- channel_order[i]
+
+        }else if(illumination_wavelengths[i] > (red_limit-50)){
+          # Finding the red channel
+          channel_color[3] <- channel_order[i]
+
+        }else{
+          # Finding the green channel
+          channel_color[2] <- channel_order[i]
+
+        }
+      }
+
+
+    }
+
+  }
+
   # Put information into a data frame
   df_metadata <- data.frame(
     "fileName" = NA,
@@ -242,6 +195,9 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     "scaling_x" = NA,
     "scaling_y" = NA,
     "scaling_z" = NA,
+    "blue_channel" = channel_color[1],
+    "green_channel" = channel_color[2],
+    "red_channel" = channel_color[3],
     "scene_name" = scene_name,
     "scene_center_position_x" = scene_center_position_x,
     "scene_center_position_y" = scene_center_position_y,

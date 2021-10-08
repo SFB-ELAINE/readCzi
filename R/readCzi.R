@@ -29,6 +29,7 @@ readCzi <- function(input_file = NULL) {
 
   # Load image directly from czi
   image_loaded <- zis$imread(input_file)
+  czi_class <- zis$CziFile(input_file)
 
   # Load metadata
   df_metadata <- readCziMetadata(input_file = input_file,
@@ -36,8 +37,6 @@ readCzi <- function(input_file = NULL) {
   metadata <- czi_class$metadata(czi_class)
 
   # Save bit depth of the image --------------------------------------------
-  czi_class <- zis$CziFile(input_file)
-
   bit_depth <- czi_class$dtype
   if(bit_depth == "uint16"){
     bit_depth <- 16
@@ -135,57 +134,61 @@ readCzi <- function(input_file = NULL) {
 
   }
 
-  # Check if there is/are specific emission wavelengths (of channels used)
+  # Decide which channel is red/green/blue
   if(grepl(pattern = "EmissionWavelength",
            x = metadata,
            ignore.case = TRUE)){
 
-    if(number_of_channels == 3){
-      wavelengths <- gsub(
-        pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-                         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-                         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-                         sep=""),
-        replacement = "\\1,\\2,\\3",
-        x = metadata)
-    }else if(number_of_channels == 2){
-      wavelengths <- gsub(
-        pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-                         ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-                         sep=""),
-        replacement = "\\1,\\2",
-        x = metadata)
-    }else if(number_of_channels == 1){
-      wavelengths <- gsub(
-        pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-                         sep=""),
-        replacement = "\\1",
-        x = metadata)
-    }
+    # if(number_of_channels == 3){
+    #   wavelengths <- gsub(
+    #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
+    #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
+    #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
+    #                      sep=""),
+    #     replacement = "\\1,\\2,\\3",
+    #     x = metadata)
+    # }else if(number_of_channels == 2){
+    #   wavelengths <- gsub(
+    #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
+    #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
+    #                      sep=""),
+    #     replacement = "\\1,\\2",
+    #     x = metadata)
+    # }else if(number_of_channels == 1){
+    #   wavelengths <- gsub(
+    #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
+    #                      sep=""),
+    #     replacement = "\\1",
+    #     x = metadata)
+    # }
 
-    wavelengths <- as.numeric(strsplit(wavelengths, split = ",")[[1]])
+    # wavelengths <- as.numeric(strsplit(wavelengths, split = ",")[[1]])
 
     # Upper and lower limits of wavelengths to determine the colors
     # red: > 600nm
     # green: >= 500nm and <= 600nm
     # blue: < 500nm
 
-    upper_limit_blue <- 500
-    lower_limit_red <- 600
+    # upper_limit_blue <- 450#500
+    # lower_limit_red <- 550#600
+    #
+    # test_red <- any(wavelengths > lower_limit_red)
+    # red_id <- ifelse(test = test_red, yes = which(wavelengths > lower_limit_red), no = 0)
+    # if(length(red_id) > 1){print("More than one red channel!?")}
+    #
+    # test_green <- any( (upper_limit_blue) <= wavelengths & (wavelengths <= lower_limit_red))
+    # green_id <- ifelse(test = test_green, yes = which((upper_limit_blue <= wavelengths) & (wavelengths <= lower_limit_red)), no = 0)
+    # if(length(green_id) > 1){print("More than one green channel!?")}
+    #
+    # test_blue <- any(wavelengths < upper_limit_blue)
+    # blue_id <- ifelse(test = test_blue, yes = which(upper_limit_blue > wavelengths), no = 0)
+    # if(length(blue_id) > 1){print("More than one blue channel!?")}
+#
+#     rgb_layers <- c(red_id, green_id, blue_id)
 
-    test_red <- any(wavelengths > lower_limit_red)
-    red_id <- ifelse(test = test_red, yes = which(wavelengths > lower_limit_red), no = 0)
-    if(length(red_id) > 1){print("More than one red channel!?")}
-
-    test_green <- any( (upper_limit_blue) <= wavelengths & (wavelengths <= lower_limit_red))
-    green_id <- ifelse(test = test_green, yes = which((upper_limit_blue <= wavelengths) & (wavelengths <= lower_limit_red)), no = 0)
-    if(length(green_id) > 1){print("More than one green channel!?")}
-
-    test_blue <- any(wavelengths < upper_limit_blue)
-    blue_id <- ifelse(test = test_blue, yes = which(upper_limit_blue > wavelengths), no = 0)
-    if(length(blue_id) > 1){print("More than one blue channel!?")}
-
-    rgb_layers <- c(red_id, green_id, blue_id)
+    rgb_layers <- c(df_metadata$red_channel,
+                    df_metadata$green_channel,
+                    df_metadata$blue_channel)
 
     color_axis <- "C"
 
@@ -230,13 +233,13 @@ readCzi <- function(input_file = NULL) {
     }
 
     if(length(dim(copy_image_loaded)) == 8){
-      if(rgb_layers[1] != 0){
+      if(!is.na(rgb_layers[1]) && rgb_layers[1] != 0){
         image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,]
       }
-      if(rgb_layers[2] != 0){
+      if(!is.na(rgb_layers[2]) && rgb_layers[2] != 0){
         image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,,,,]
       }
-      if(rgb_layers[3] != 0){
+      if(!is.na(rgb_layers[3]) && rgb_layers[3] != 0){
         image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,,]
       }
 
