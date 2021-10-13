@@ -3,3 +3,4 @@
 export(convertCziToTif)
 export(readCzi)
 export(readCziMetadata)
+export(stackLayers)

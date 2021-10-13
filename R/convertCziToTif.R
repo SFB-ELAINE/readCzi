@@ -101,35 +101,9 @@ convertCziToTif <- function(input_file = NULL,
 
   # Save z-stack or original image (with z=1) ------------------------------
   if(dim_z > 1 && stack_image){
-    stack_method <- tolower(stack_method)
-    Image_Stack <- EBImage::Image(data = array(0, dim = dim(Image_Data)[1:3]), colormode = "Color")
 
-    if(stack_method == "average" || stack_method ==  "mean"){
-
-      for(i in 1:dim(Image_Data)[3]){
-        Image_Stack[,,i] <- apply(Image_Data[,,i,], c(1,2), mean)
-      }
-
-      #Alternatives?
-      # Get all color frames
-      #getFrames(y = Input_Image, type = "render")
-      #nuc_th = combine( mapply(function(frame, th) frame > th, getFrames(nuc), threshold, SIMPLIFY=FALSE) )
-
-      #https://dahtah.github.io/imager/imager.html
-
-    }else if(stack_method == "maxprojection" || stack_method == "max"){
-
-      for(i in 1:dim(Image_Data)[3]){
-        Image_Stack[,,i] = apply(Image_Data[,,i,], c(1,2), max)
-      }
-
-    }else if(stack_method == "addandnormalize"){
-
-    }else if(stack_method == "maxcontrast"){
-
-    }
-    # Check out https://bioconductor.riken.jp/packages/3.7/bioc/vignettes/MaxContrastProjection/inst/doc/MaxContrastProjection.pdf
-    # It is not working right now
+    Image_Stack <- stackLayers(image_data = Image_Data,
+                               stack_method = stack_method)
 
     stack_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack.tif", sep="")
     EBImage::writeImage(x = Image_Stack, files = stack_file_name, type = "tiff", bits.per.sample = 8)
