@@ -8,9 +8,12 @@
 #' @param image_data An array of EBImage object
 #' @param stack_method A character (method for stacking the images: average,
 #' maxprojection)
+#' @param as_array A boolean (if TRUE, the data is return as an array and not
+#' an EBImage class)
 #'
 stackLayers <- function(image_data = NULL,
-                        stack_method = "average") {
+                        stack_method = "average",
+                        as_array = FALSE) {
 
   if(is.null(image_data)){
     print("Please call function with image data.")
@@ -51,6 +54,10 @@ stackLayers <- function(image_data = NULL,
   }
   # Check out https://bioconductor.riken.jp/packages/3.7/bioc/vignettes/MaxContrastProjection/inst/doc/MaxContrastProjection.pdf
   # It is not working right now
+
+  if(as_array){
+    Image_Stack <- as.array(Image_Stack)
+  }
 
   return(Image_Stack)
 

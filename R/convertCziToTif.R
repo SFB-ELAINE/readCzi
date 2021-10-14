@@ -154,22 +154,42 @@ convertCziToTif <- function(input_file = NULL,
 
     if(dim_z > 1){
 
+      # for(i in 1:3){
+      #   if(max(Image_Stack[,,i]) > 0){
+      #     Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
+      #   }
+      # }
+
+      disregarded_layers <- c()
       for(i in 1:3){
-        if(max(Image_Stack[,,i]) > 0){
-          Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
+        if(max(Image_Stack[,,i]) == 0){
+          disregarded_layers <- c(disregarded_layers, i)
         }
       }
 
-      output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack_normalized.tif", sep="")
+      Image_Stack_normalized <- normalizeIntensity(image = Image_Stack_normalized,
+                                                   disregarded_layers = disregarded_layers)
+
+      output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack_histogram_equalized_normalized.tif", sep="")
     }else{
 
+      # for(i in 1:3){
+      #   if(max(Image_Data[,,i]) > 0){
+      #     Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
+      #   }
+      # }
+
+      disregarded_layers <- c()
       for(i in 1:3){
-        if(max(Image_Data[,,i]) > 0){
-          Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
+        if(max(Image_Data[,,i]) == 0){
+          disregarded_layers <- c(disregarded_layers, i)
         }
       }
 
-      output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_normalized.tif", sep="")
+      Image_Stack_normalized <- normalizeIntensity(image = Image_Stack_normalized,
+                                                   disregarded_layers = disregarded_layers)
+
+      output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_histogram_equalized_normalized.tif", sep="")
     }
 
     EBImage::writeImage(x = Image_Stack_normalized, files = output_file_name, type = "tiff", bits.per.sample = 8)

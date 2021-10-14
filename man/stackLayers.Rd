@@ -6,13 +6,16 @@
 \alias{StackLayers}
 \title{stackLayers}
 \usage{
-stackLayers(image_data = NULL, stack_method = "average")
+stackLayers(image_data = NULL, stack_method = "average", as_array = FALSE)
 }
 \arguments{
 \item{image_data}{An array of EBImage object}
 
 \item{stack_method}{A character (method for stacking the images: average,
 maxprojection)}
+
+\item{as_array}{A boolean (if TRUE, the data is return as an array and not
+an EBImage class)}
 }
 \description{
 Stacks z-layers

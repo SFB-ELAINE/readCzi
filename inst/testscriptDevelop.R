@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/10/08
+# Last changed: 2021/10/14
 
 
 # ATTENTION: It is better to use/import small(er) czi files. So please do
@@ -66,7 +66,7 @@ load_all()
 #input_file <- "examples/LSM_threeChannels.czi"
 #input_file <- "examples/LSM_CellBiology.czi"
 
-#input_folder <-  "examples/detectCiliaNew"
+#input_folder <-  "E:/LSM/"
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -93,7 +93,27 @@ convertCziToTif(input_file = input_file)
 # czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
 #
 # for(file_number in 1:length(czi_files)){
-#   convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE)
+#   convertCziToTif(input_file = czi_files[file_number])
+#
+#   if(file_number == 1){
+#     df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
+#   }else{
+#     df_dummy <- readCziMetadata(input_file <- czi_files[file_number])
+#     df_metadata <- rbind(df_metadata, df_dummy)
+#   }
+# }
+#
+# #save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
+# write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""),
+#            row.names = FALSE)
+
+### Convert cilia images from directory ------------------------------------
+
+# czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
+#
+# for(file_number in 1:length(czi_files)){
+#   convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE,
+#                   stack_method = "maxprojection", change_layers = "red<->green")
 #
 #   if(file_number == 1){
 #     df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
@@ -105,23 +125,4 @@ convertCziToTif(input_file = input_file)
 #
 # save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
 # write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
-
-### Convert cilia images from directory ------------------------------------
-
-czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
-
-for(file_number in 1:length(czi_files)){
-  convertCziToTif(input_file = czi_files[file_number], convert_all_slices = FALSE,
-                  stack_method = "maxprojection", change_layers = "red<->green")
-
-  if(file_number == 1){
-    df_metadata <- readCziMetadata(input_file <- czi_files[file_number])
-  }else{
-    df_dummy <- readCziMetadata(input_file <- czi_files[file_number])
-    df_metadata <- rbind(df_metadata, df_dummy)
-  }
-}
-
-save(df_metadata, file = paste(input_folder, "/output/df_metadata.Rda", sep=""))
-write.csv2(x = df_metadata, file = paste(input_folder, "/output/df_metadata_de.csv", sep=""))
 
