@@ -219,7 +219,7 @@ readCziMetadata <- function(input_file = NULL,
     dim_z <- unlist(metadata_XML_list$ImageDocument$Metadata$Information$Image$SizeZ)
     dim_z <- as.numeric(dim_z)
   }else{
-    dim_z <- NA
+    dim_z <- 1
   }
   if(grepl(pattern = "SizeC", x = metadata_XML_list)){
     number_of_channels <- unlist(metadata_XML_list$ImageDocument$Metadata$Information$Image$SizeC)
