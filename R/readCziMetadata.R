@@ -197,7 +197,7 @@ readCziMetadata <- function(input_file = NULL,
     scaling_z <- tolower(scaling_z)
     scaling_z <- as.numeric(scaling_z)
   }else{
-    scaling_z <- NA
+    scaling_z <- 0
   }
 
 

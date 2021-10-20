@@ -26,6 +26,8 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   emission_wavelengths <- rep(x = NA, number_of_channels)
   illumination_wavelengths <- rep(x = NA, number_of_channels)
   light_source_intensitys <- rep(x = NA, number_of_channels)
+  exposure_times <- rep(x = NA, number_of_channels)
+  fluorophores <- rep(x = NA, number_of_channels)
 
   # Go through each channel and get information ############################
   for(i in 1:number_of_channels){
@@ -70,6 +72,14 @@ readCziMetadata_Apotome <- function(metadata = metadata,
       light_source_intensitys[i] <- as.numeric(dump_light_source_intensitys)
       rm(dump_light_source_intensitys)
     }
+
+    # Exposure Time
+    if(grepl(pattern = "ExposureTime", x = channel_information, ignore.case = TRUE)){
+      exposure_times[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
+    }
+
+    # Fluorphore
+    fluorophores[i] <- unlist(channel_information[[1]]$Fluor)
 
   }
 
@@ -117,6 +127,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     excitation_wavelengths_copy <- excitation_wavelengths
     emission_wavelengths_copy <- emission_wavelengths
     light_source_intensitys_copy <- light_source_intensitys
+    fluorophores_copy <- fluorophores
 
     for(i in 1:number_of_channels){
       acquisition_mode[i] <- acquisition_mode_copy[channel_order[i]]
@@ -125,6 +136,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
       excitation_wavelengths[i] <- excitation_wavelengths_copy[channel_order[i]]
       emission_wavelengths[i] <- emission_wavelengths_copy[channel_order[i]]
       light_source_intensitys[i] <- light_source_intensitys_copy[channel_order[i]]
+      fluorophores[i] <- fluorophores_copy[channel_order[i]]
     }
   }
 
@@ -198,6 +210,12 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     "blue_channel" = channel_color[1],
     "green_channel" = channel_color[2],
     "red_channel" = channel_color[3],
+    "channel_name_1" = channel_names[1],
+    "channel_name_2" = channel_names[2],
+    "channel_name_3" = channel_names[3],
+    "fluorophore_1" = fluorophores[1],
+    "fluorophore_2" = fluorophores[2],
+    "fluorophore_3" = fluorophores[3],
     "scene_name" = scene_name,
     "scene_center_position_x" = scene_center_position_x,
     "scene_center_position_y" = scene_center_position_y,
@@ -220,7 +238,10 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     "emission_wavelength_3" =  emission_wavelengths[3],
     "light_source_intensity_1" =  light_source_intensitys[1],
     "light_source_intensity_2" =  light_source_intensitys[2],
-    "light_source_intensity_3" =  light_source_intensitys[3]
+    "light_source_intensity_3" =  light_source_intensitys[3],
+    "exposure_time_1" = exposure_times[1],
+    "exposure_time_2" = exposure_times[2],
+    "exposure_time_3" = exposure_times[3]
   )
 
   return(df_metadata)

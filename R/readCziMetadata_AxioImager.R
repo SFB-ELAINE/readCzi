@@ -27,6 +27,8 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   emission_wavelengths <- rep(x = NA, number_of_channels)
   illumination_wavelengths <- rep(x = NA, number_of_channels)
   light_source_intensitys <- rep(x = NA, number_of_channels)
+  exposure_times <- rep(x = NA, number_of_channels)
+  fluorophores <- rep(x = NA, number_of_channels)
 
   # Go through each channel and get information ############################
   for(i in 1:number_of_channels){
@@ -50,6 +52,14 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
       illumination_type[i] <- NA
     }
 
+    # Exposure Time
+    if(grepl(pattern = "ExposureTime", x = channel_information, ignore.case = TRUE)){
+      exposure_times[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
+    }
+
+    # Fluorphore
+    fluorophores[i] <- unlist(channel_information[[1]]$Fluor)
+
   }
 
   # Put information into a data frame
@@ -69,7 +79,16 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     "scaling_y" = NA,
     "scaling_z" = NA,
     "acquisition_mode" = acquisition_mode,
-    "illumination_type" = illumination_type
+    "illumination_type" = illumination_type,
+    "exposure_time_1" = exposure_times[1],
+    "exposure_time_2" = exposure_times[2],
+    "exposure_time_3" = exposure_times[3],
+    "channel_name_1" = channel_names[1],
+    "channel_name_2" = channel_names[2],
+    "channel_name_3" = channel_names[3],
+    "fluorophore_1" = fluorophores[1],
+    "fluorophore_2" = fluorophores[2],
+    "fluorophore_3" = fluorophores[3]
   )
 
   return(df_metadata)
