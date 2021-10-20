@@ -121,7 +121,7 @@ convertCziToTif <- function(input_file = NULL,
   if(dim_z > 1 && higher_contrast_slices){
 
     Image_Data_histogram_equalization <- EBImage::combine(lapply(X = EBImage::getFrames(y = Image_Data, type = "render"),
-                                                                 FUN = function(frame){EBImage::clahe(x = frame)}))
+                                                                 FUN = function(frame){EBImage::clahe(x = frame, nx = 4)}))
 
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], "_histogram_equalized.tif", sep="")
@@ -135,11 +135,11 @@ convertCziToTif <- function(input_file = NULL,
 
     if(dim_z > 1){
       # Use Contrast Limited Adaptive Histogram Equalization
-      Image_Stack_histogram_equalization <- EBImage::clahe(x = Image_Stack)
+      Image_Stack_histogram_equalization <- EBImage::clahe(x = Image_Stack, nx = 4)
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack_histogram_equalized.tif", sep="")
     }else{
       # Use Contrast Limited Adaptive Histogram Equalization
-      Image_Stack_histogram_equalization <- EBImage::clahe(x = Image_Data)
+      Image_Stack_histogram_equalization <- EBImage::clahe(x = Image_Data, nx = 4)
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_histogram_equalized.tif", sep="")
     }
 

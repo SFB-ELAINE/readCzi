@@ -203,8 +203,8 @@ readCzi <- function(input_file = NULL) {
     # Reorganize the array according according to: "X","Y", "C"/"0", "Z"
     new_array_order <- c("X", "Y", color_axis, "Z")
   }else{
-    print(paste("The image is one-dimensional in z-direction (no z-stack).",
-                sep=""))
+    # print(paste("The image is one-dimensional in z-direction (no z-stack).",
+    #             sep=""))
 
     # Reorganize the array according according to: "X","Y", "C"/"0"
     new_array_order <- c("X", "Y", color_axis)
