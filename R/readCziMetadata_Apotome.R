@@ -8,7 +8,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
 
   metadata_XML <- xml2::read_xml(x = metadata)
 
-  # Get information of laser microscopes with apotome ######################
+  # Get information of laser microscopes with Apotome ######################
 
   # Channel names
   look_for <- paste(".//Channel", sep="")

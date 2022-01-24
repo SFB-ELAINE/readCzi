@@ -19,6 +19,8 @@
 #' @param normalize_stack A logical (T/F for normalizing intensities of stack)
 #' @param change_layers A character (either "none" or, e.g., "green<->red")
 
+# TODO: stack_method: average OR max (instead of maxprojection)
+
 convertCziToTif <- function(input_file = NULL,
                             convert_all_slices = FALSE,
                             stack_image = TRUE,

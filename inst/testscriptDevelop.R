@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi for development  ++++++++++++++
 # Author: Kai Budde
 # Created: 2021/03/05
-# Last changed: 2021/10/14
+# Last changed: 2022/01/24
 
 
 # ATTENTION: It is better to use/import small(er) czi files. So please do
@@ -50,7 +50,7 @@ reticulate::py_install("czifile")
 #require(stackImages)
 
 # Check package
-#check()
+# check()
 
 # Document package
 document()
@@ -65,9 +65,11 @@ load_all()
 #input_file <- "examples/LSM_twoChannels.czi"
 #input_file <- "examples/LSM_threeChannels.czi"
 #input_file <- "examples/LSM_CellBiology.czi"
-
+input_file <- "examples/V5_BetaCatenin_385Hochst_475ActinAF488_555BetaCateninAF555_20x_30min_Stim-Scene-05-P5.czi"
 #input_folder <-  "E:/LSM/"
 
+# input_file <- "Y:/20210624_AuswertungBilderRPaket_ALT/190815/190815_EV38_2_Kollagen mit Asc u Dexa_63x_zstack_6.czi"
+# convertCziToTif(input_file = input_file, convert_all_slices = T, stack_image = TRUE, stack_method = "maxprojection")
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 ### Test small functions ---------------------------------------------------

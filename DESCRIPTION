@@ -1,7 +1,7 @@
 Package: readCzi
 Type: Package
 Title: Read czi image files, convert them to tifs, and save metadata
-Version: 0.1.10
+Version: 0.1.11
 Author: c(person("Kai", "Budde", email = "kai.budde@uni-rostock.de",
     role = c("aut", "cre"))
 Maintainer: Kai Budde <kai.budde@uni-rostock.de>
@@ -12,4 +12,4 @@ License: LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: BiocManager, reticulate, EBImage, xml2
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

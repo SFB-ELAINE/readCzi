@@ -131,6 +131,10 @@ readCziMetadata <- function(input_file = NULL,
   # Objective
   if(grepl(pattern = "Objectives", x = metadata_XML_list)){
     objective <- unlist(metadata_XML_list$ImageDocument$Metadata$Information$Instrument$Objectives$Objective$Manufacturer$Model)
+    if(is.null(objective)){
+      objective <- attr(x = metadata_XML_list$ImageDocument$Metadata$Information$Instrument$Objectives$Objective, which = "Name")
+    }
+
   }else{
     objective <- NA
   }
@@ -269,7 +273,7 @@ readCziMetadata <- function(input_file = NULL,
   #   pixel_type <- NA
   # }
 
-  if(tolower(pixel_type) == "bgr24"){
+  if(tolower(pixel_type) == "bgr24" | tolower(pixel_type) == "bgr48"){
     color_axis <- "0"
   }else{
     color_axis <- "C"
@@ -279,7 +283,7 @@ readCziMetadata <- function(input_file = NULL,
   # Microscope-specific information ########################################
 
   if(color_axis == "0"){
-    # Type of microscope: AxioImager
+    # Type of microscope: AxioImager or Axio Image.M2
     df_metadata <- readCziMetadata_AxioImager(metadata, number_of_channels)
     # Type of microscope: LSM (in wide field acquisition mode)
   }else if(color_axis == "C" &&

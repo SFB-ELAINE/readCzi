@@ -14,8 +14,13 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   # Channel names
   look_for <- paste(".//Channel", sep="")
   channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+  channel_ids <- unique(xml2::xml_attr(x = channel_information, attr = "Id"))
   channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+  channel_names <- channel_names[!is.na(channel_names)]
 
+  if(number_of_channels != length(channel_ids)){
+    print("The number of channels does not correspond to the number of channel ids in the metadata.")
+  }
   if(number_of_channels != length(channel_names)){
     print("The number of channels does not correspond to the number of channel names in the metadata.")
   }
@@ -34,7 +39,7 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   for(i in 1:number_of_channels){
 
     # Filter for channel name
-    look_for <- paste(".//Dimensions/Channels/Channel[@Name='", channel_names[i], "']", sep="")
+    look_for <- paste(".//Dimensions/Channels/Channel[@Id='", channel_ids[i], "']", sep="")
     channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
     channel_information <- xml2::as_list(channel_information)
 
