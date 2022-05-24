@@ -39,7 +39,9 @@ require(XML)
 # Read in Python package for reading czi files
 # (Users will be asked to install miniconda
 # when starting for the first time)
-reticulate::py_install("czifile")
+if(! "czifile" %in% reticulate::py_list_packages()$package){
+  reticulate::py_install("czifile")
+}
 
 # Install the R package for producing stacks of the images
 #if(!("stackImages" %in% installed.packages()[,"Package"])){
@@ -53,19 +55,19 @@ reticulate::py_install("czifile")
 # check()
 
 # Document package
-document()
+# document()
 
 # Load package to use it
 load_all()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#input_file <- "examples/AxioImager_Test.czi"
-#input_file <- "examples/Apotome_Test.czi"
+input_file <- "examples/AxioImager_Test.czi"
+# input_file <- "examples/Apotome_Test.czi"
 #input_file <- "examples/LSM_twoChannels.czi"
-#input_file <- "examples/LSM_threeChannels.czi"
+# input_file <- "examples/LSM_threeChannels.czi"
 #input_file <- "examples/LSM_CellBiology.czi"
-input_file <- "examples/V5_BetaCatenin_385Hochst_475ActinAF488_555BetaCateninAF555_20x_30min_Stim-Scene-05-P5.czi"
+# input_file <- "examples/V5_BetaCatenin_385Hochst_475ActinAF488_555BetaCateninAF555_20x_30min_Stim-Scene-05-P5.czi"
 #input_folder <-  "E:/LSM/"
 
 # input_file <- "Y:/20210624_AuswertungBilderRPaket_ALT/190815/190815_EV38_2_Kollagen mit Asc u Dexa_63x_zstack_6.czi"

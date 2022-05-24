@@ -161,47 +161,60 @@ readCziMetadata <- function(input_file = NULL,
   #   objective_magnification <- NA
   # }
 
-  # Scaling (in m)
+  # Scaling (in um)
   if(grepl(pattern = "scalingX", x = metadata, ignore.case = TRUE)){
-    scaling_x <- gsub(pattern = ".+<ScalingX>(.+)</ScalingX>.+",
+    scaling_x_in_um <- gsub(pattern = ".+<ScalingX>(.+)</ScalingX>.+",
                       replacement = "\\1", x = metadata)
-    scaling_x <- tolower(scaling_x)
-    scaling_x <- as.numeric(scaling_x)
+    scaling_x_in_um <- tolower(scaling_x_in_um)
+    scaling_x_in_um <- as.numeric(scaling_x_in_um)
   }else if(grepl(pattern = "<Distance Id=\"X\">", x = metadata, ignore.case = TRUE)){
-    scaling_x <- gsub(pattern = ".+<Distance Id=\"X\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
+    scaling_x_in_um <- gsub(pattern = ".+<Distance Id=\"X\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
                       replacement = "\\1", x = metadata)
-    scaling_x <- tolower(scaling_x)
-    scaling_x <- as.numeric(scaling_x)
+    scaling_x_in_um <- tolower(scaling_x_in_um)
+    scaling_x_in_um <- as.numeric(scaling_x_in_um)
   }else{
-    scaling_x <- NA
+    scaling_x_in_um <- NA
+  }
+  if(scaling_x_in_um < 1e-3){
+    # Assuming that it is given in m -> recalculate to um
+    scaling_x_in_um <- scaling_x_in_um * 1e6
   }
 
   if(grepl(pattern = "ScalingY", x = metadata, ignore.case = TRUE)){
-    scaling_y <- gsub(pattern = ".+<ScalingY>(.+)</ScalingY>.+",
+    scaling_y_in_um <- gsub(pattern = ".+<ScalingY>(.+)</ScalingY>.+",
                       replacement = "\\1", x = metadata)
-    scaling_y <- tolower(scaling_y)
-    scaling_y <- as.numeric(scaling_y)
+    scaling_y_in_um <- tolower(scaling_y_in_um)
+    scaling_y_in_um <- as.numeric(scaling_y_in_um)
   }else if(grepl(pattern = "<Distance Id=\"Y\">", x = metadata, ignore.case = TRUE)){
-    scaling_y <- gsub(pattern = ".+<Distance Id=\"Y\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
+    scaling_y_in_um <- gsub(pattern = ".+<Distance Id=\"Y\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
                       replacement = "\\1", x = metadata)
-    scaling_y <- tolower(scaling_y)
-    scaling_y <- as.numeric(scaling_y)
+    scaling_y_in_um <- tolower(scaling_y_in_um)
+    scaling_y_in_um <- as.numeric(scaling_y_in_um)
   }else{
-    scaling_y <- NA
+    scaling_y_in_um <- NA
+  }
+  if(scaling_y_in_um < 1e-3){
+    # Assuming that it is given in m -> recalculate to um
+    scaling_y_in_um <- scaling_y_in_um * 1e6
   }
 
+
   if(grepl(pattern = "ScalingZ", x = metadata, ignore.case = TRUE)){
-    scaling_z <- gsub(pattern = ".+<ScalingZ>(.+)</ScalingZ>.+",
+    scaling_z_in_um <- gsub(pattern = ".+<ScalingZ>(.+)</ScalingZ>.+",
                       replacement = "\\1", x = metadata)
-    scaling_z <- tolower(scaling_z)
-    scaling_z <- as.numeric(scaling_z)
+    scaling_z_in_um <- tolower(scaling_z_in_um)
+    scaling_z_in_um <- as.numeric(scaling_z_in_um)
   }else if(grepl(pattern = "<Distance Id=\"Z\">", x = metadata, ignore.case = TRUE)){
-    scaling_z <- gsub(pattern = ".+<Distance Id=\"Z\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
+    scaling_z_in_um <- gsub(pattern = ".+<Distance Id=\"Z\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
                       replacement = "\\1", x = metadata)
-    scaling_z <- tolower(scaling_z)
-    scaling_z <- as.numeric(scaling_z)
+    scaling_z_in_um <- tolower(scaling_z_in_um)
+    scaling_z_in_um <- as.numeric(scaling_z_in_um)
   }else{
-    scaling_z <- 0
+    scaling_z_in_um <- 0
+  }
+  if(scaling_z_in_um < 1e-3){
+    # Assuming that it is given in m -> recalculate to um
+    scaling_z_in_um <- scaling_z_in_um * 1e6
   }
 
 
@@ -313,9 +326,9 @@ readCziMetadata <- function(input_file = NULL,
   df_metadata$dim_x <- dim_x
   df_metadata$dim_y <- dim_y
   df_metadata$dim_z <- dim_z
-  df_metadata$scaling_x <- scaling_x
-  df_metadata$scaling_y <- scaling_y
-  df_metadata$scaling_z <- scaling_z
+  df_metadata$scaling_x_in_um <- scaling_x_in_um
+  df_metadata$scaling_y_in_um <- scaling_y_in_um
+  df_metadata$scaling_z_in_um <- scaling_z_in_um
 
   return(df_metadata)
 }

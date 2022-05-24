@@ -21,10 +21,10 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
   # Empty vectors
   fluorophores <- rep(x = NA, number_of_channels)
-  detection_wavelength_start <- rep(x = NA, number_of_channels)
-  detection_wavelength_end <- rep(x = NA, number_of_channels)
-  excitation_wavelengths <- rep(x = NA, number_of_channels)
-  emission_wavelengths <- rep(x = NA, number_of_channels)
+  detection_wavelength_start_in_nm <- rep(x = NA, number_of_channels)
+  detection_wavelength_end_in_nm <- rep(x = NA, number_of_channels)
+  excitation_wavelengths_in_nm <- rep(x = NA, number_of_channels)
+  emission_wavelengths_in_nm <- rep(x = NA, number_of_channels)
   laser_scan_pixel_times <- rep(x = NA, number_of_channels)
   averaging <- rep(x = NA, number_of_channels)
   laser_scan_zoom_x <- rep(x = NA, number_of_channels)
@@ -34,7 +34,7 @@ readCziMetadata_LSM <- function(metadata = metadata,
   digital_gain <- rep(x = NA, number_of_channels)
   amplifier_offset <- rep(x = NA, number_of_channels)
 
-  laser_wavelength <- rep(x = NA, number_of_channels)
+  laser_wavelength_in_nm <- rep(x = NA, number_of_channels)
   laser_transmission <- rep(x = NA, number_of_channels)
   laser_name <- rep(x = NA, number_of_channels)
   laser_power <- rep(x = NA, number_of_channels)
@@ -52,21 +52,21 @@ readCziMetadata_LSM <- function(metadata = metadata,
     fluorophores[i] <- unlist(channel_information[[1]]$Fluor)
 
     # Detection wavelengths
-    detection_wavelength_start[i] <- as.numeric(unlist(
+    detection_wavelength_start_in_nm[i] <- as.numeric(unlist(
       strsplit(
         x = unlist(channel_information[[1]]$DetectionWavelength$Ranges),
         split = "-"))[1])
-    detection_wavelength_end[i] <- as.numeric(unlist(
+    detection_wavelength_end_in_nm[i] <- as.numeric(unlist(
       strsplit(
         x = unlist(channel_information[[1]]$DetectionWavelength$Ranges),
         split = "-"))[2])
 
     # Excitation and emission wavelengths
     if(grepl(pattern = "ExcitationWavelength", x = channel_information, ignore.case = TRUE)){
-      excitation_wavelengths[i] <- as.numeric(unlist(channel_information[[1]]$ExcitationWavelength))
+      excitation_wavelengths_in_nm[i] <- as.numeric(unlist(channel_information[[1]]$ExcitationWavelength))
     }
     if(grepl(pattern = "EmissionWavelength", x = channel_information, ignore.case = TRUE)){
-      emission_wavelengths[i] <- as.numeric(unlist(channel_information[[1]]$EmissionWavelength))
+      emission_wavelengths_in_nm[i] <- as.numeric(unlist(channel_information[[1]]$EmissionWavelength))
     }
 
     # Laser scan pixel times
@@ -105,13 +105,13 @@ readCziMetadata_LSM <- function(metadata = metadata,
   rm(i)
 
   # Sorting the channels information regarding wavelength ------------------
-  channel_order <- order(detection_wavelength_start)
+  channel_order <- order(detection_wavelength_start_in_nm)
 
   fluorophores_copy <- fluorophores
-  detection_wavelength_start_copy <- detection_wavelength_start
-  detection_wavelength_end_copy <- detection_wavelength_end
-  excitation_wavelengths_copy <- excitation_wavelengths
-  emission_wavelengths_copy <- emission_wavelengths
+  detection_wavelength_start_copy <- detection_wavelength_start_in_nm
+  detection_wavelength_end_copy <- detection_wavelength_end_in_nm
+  excitation_wavelengths_copy <- excitation_wavelengths_in_nm
+  emission_wavelengths_copy <- emission_wavelengths_in_nm
   laser_scan_pixel_times_copy <- laser_scan_pixel_times
   averaging_copy <- averaging
   laser_scan_zoom_x_copy <- laser_scan_zoom_x
@@ -123,10 +123,10 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
   for(i in 1:number_of_channels){
     fluorophores[i] <- fluorophores_copy[channel_order[i]]
-    detection_wavelength_start[i] <- detection_wavelength_start_copy[channel_order[i]]
-    detection_wavelength_end[i] <- detection_wavelength_end_copy[channel_order[i]]
-    excitation_wavelengths[i] <- excitation_wavelengths_copy[channel_order[i]]
-    emission_wavelengths[i] <- emission_wavelengths_copy[channel_order[i]]
+    detection_wavelength_start_in_nm[i] <- detection_wavelength_start_copy[channel_order[i]]
+    detection_wavelength_end_in_nm[i] <- detection_wavelength_end_copy[channel_order[i]]
+    excitation_wavelengths_in_nm[i] <- excitation_wavelengths_copy[channel_order[i]]
+    emission_wavelengths_in_nm[i] <- emission_wavelengths_copy[channel_order[i]]
     laser_scan_pixel_times[i] <- laser_scan_pixel_times_copy[channel_order[i]]
     averaging[i] <- averaging_copy[channel_order[i]]
     laser_scan_zoom_x[i] <- laser_scan_zoom_x_copy[channel_order[i]]
@@ -159,7 +159,7 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
     if(grepl(pattern = "Wavelength", x = laser_information, ignore.case = TRUE)){
 
-      laser_wavelength[i] <- as.numeric(unlist(laser_information[[1]]$Wavelength))
+      laser_wavelength_in_nm[i] <- as.numeric(unlist(laser_information[[1]]$Wavelength))
     }
 
     if(grepl(pattern = "Transmission", x = laser_information, ignore.case = TRUE)){
@@ -170,17 +170,17 @@ readCziMetadata_LSM <- function(metadata = metadata,
   rm(i)
 
   # Sort experiment information --------------------------------------------
-  experiment_order <- order(laser_wavelength)
+  experiment_order <- order(laser_wavelength_in_nm)
 
   laser_name_copy <- laser_name
   laser_power_copy <- laser_power
-  laser_wavelength_copy <- laser_wavelength
+  laser_wavelength_copy <- laser_wavelength_in_nm
   laser_transmission_copy <- laser_transmission
 
   for(i in 1:number_of_channels){
     laser_name[i] <- laser_name_copy[experiment_order[i]]
     laser_power[i] <- laser_power_copy[experiment_order[i]]
-    laser_wavelength[i] <- laser_wavelength_copy[experiment_order[i]]
+    laser_wavelength_in_nm[i] <- laser_wavelength_copy[experiment_order[i]]
     laser_transmission[i] <- laser_transmission_copy[experiment_order[i]]
   }
 
@@ -200,12 +200,12 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
     for(i in 1:number_of_channels){
 
-      if(!is.na(emission_wavelengths[i])){
-        if(emission_wavelengths[i] < blue_limit){
+      if(!is.na(emission_wavelengths_in_nm[i])){
+        if(emission_wavelengths_in_nm[i] < blue_limit){
           # Finding the blue channel
           channel_color[1] <- channel_order[i]
 
-        }else if(emission_wavelengths[i] > red_limit){
+        }else if(emission_wavelengths_in_nm[i] > red_limit){
           # Finding the red channel
           channel_color[3] <- channel_order[i]
 
@@ -216,11 +216,11 @@ readCziMetadata_LSM <- function(metadata = metadata,
         }
       }else{
 
-        if(detection_wavelength_start[i] < (blue_limit-50)){
+        if(detection_wavelength_start_in_nm[i] < (blue_limit-50)){
           # Finding the blue channel
           channel_color[1] <- channel_order[i]
 
-        }else if(detection_wavelength_start[i] > (red_limit-50)){
+        }else if(detection_wavelength_start_in_nm[i] > (red_limit-50)){
           # Finding the red channel
           channel_color[3] <- channel_order[i]
 
@@ -236,6 +236,22 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
   }
 
+  # Recalculate if numbers are not in the right unit
+  detection_wavelength_start_in_nm[detection_wavelength_start_in_nm < 1e-6] <-
+    detection_wavelength_start_in_nm[detection_wavelength_start_in_nm < 1e-6] * 1e9
+
+  detection_wavelength_end_in_nm[detection_wavelength_end_in_nm < 1e-6] <-
+    detection_wavelength_end_in_nm[detection_wavelength_end_in_nm < 1e-6] * 1e9
+
+  excitation_wavelengths_in_nm[excitation_wavelengths_in_nm < 1e-6] <-
+    excitation_wavelengths_in_nm[excitation_wavelengths_in_nm < 1e-6] * 1e9
+
+  emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] <-
+    emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] * 1e9
+
+  laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] <-
+    laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] * 1e9
+
   # Put information into a data frame
   df_metadata <- data.frame(
     "fileName" = NA,
@@ -249,9 +265,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "dim_x" = NA,
     "dim_y" = NA,
     "dim_z" = NA,
-    "scaling_x" = NA,
-    "scaling_y" = NA,
-    "scaling_z" = NA,
+    "scaling_x_in_um" = NA,
+    "scaling_y_in_um" = NA,
+    "scaling_z_in_um" = NA,
     "blue_channel" = channel_color[1],
     "green_channel" = channel_color[2],
     "red_channel" = channel_color[3],
@@ -261,18 +277,18 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "fluorophore_1" = fluorophores[1],
     "fluorophore_2" = fluorophores[2],
     "fluorophore_3" = fluorophores[3],
-    "detection_wavelength_start_1" = detection_wavelength_start[1],
-    "detection_wavelength_end_1" = detection_wavelength_end[1],
-    "detection_wavelength_start_2" = detection_wavelength_start[2],
-    "detection_wavelength_end_2" = detection_wavelength_end[2],
-    "detection_wavelength_start_3" = detection_wavelength_start[3],
-    "detection_wavelength_end_3" = detection_wavelength_end[3],
-    "excitation_wavelength_1"= excitation_wavelengths[1],
-    "excitation_wavelength_2"= excitation_wavelengths[2],
-    "excitation_wavelength_3"= excitation_wavelengths[3],
-    "emission_wavelength_1"= emission_wavelengths[1],
-    "emission_wavelength_2"= emission_wavelengths[2],
-    "emission_wavelength_3"= emission_wavelengths[3],
+    "detection_wavelength_start_1_in_nm" = detection_wavelength_start_in_nm[1],
+    "detection_wavelength_end_1_in_nm" = detection_wavelength_end_in_nm[1],
+    "detection_wavelength_start_2_in_nm" = detection_wavelength_start_in_nm[2],
+    "detection_wavelength_end_2_in_nm" = detection_wavelength_end_in_nm[2],
+    "detection_wavelength_start_3_in_nm" = detection_wavelength_start_in_nm[3],
+    "detection_wavelength_end_3_in_nm" = detection_wavelength_end_in_nm[3],
+    "excitation_wavelength_1_in_nm"= excitation_wavelengths_in_nm[1],
+    "excitation_wavelength_2_in_nm"= excitation_wavelengths_in_nm[2],
+    "excitation_wavelength_3_in_nm"= excitation_wavelengths_in_nm[3],
+    "emission_wavelength_1_in_nm"= emission_wavelengths_in_nm[1],
+    "emission_wavelength_2_in_nm"= emission_wavelengths_in_nm[2],
+    "emission_wavelength_3_in_nm"= emission_wavelengths_in_nm[3],
     "laser_scan_pixel_time_1" = laser_scan_pixel_times[1],
     "laser_scan_pixel_time_2" = laser_scan_pixel_times[2],
     "laser_scan_pixel_time_3" = laser_scan_pixel_times[3],
@@ -297,9 +313,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "amplifier_offset_1" = amplifier_offset[1],
     "amplifier_offset_2" = amplifier_offset[2],
     "amplifier_offset_3" = amplifier_offset[3],
-    "laser_wavelength_1" = laser_wavelength[1],
-    "laser_wavelength_2" = laser_wavelength[2],
-    "laser_wavelength_3" = laser_wavelength[3],
+    "laser_wavelength_1_in_nm" = laser_wavelength_in_nm[1],
+    "laser_wavelength_2_in_nm" = laser_wavelength_in_nm[2],
+    "laser_wavelength_3_in_nm" = laser_wavelength_in_nm[3],
     "laser_name_1" = laser_name[1],
     "laser_name_2" = laser_name[2],
     "laser_name_3" = laser_name[3],

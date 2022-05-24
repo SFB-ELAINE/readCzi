@@ -15,6 +15,7 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   look_for <- paste(".//Channel", sep="")
   channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
   channel_ids <- unique(xml2::xml_attr(x = channel_information, attr = "Id"))
+  channel_ids <- channel_ids[!is.na(channel_ids)]
   channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
   channel_names <- channel_names[!is.na(channel_names)]
 
@@ -38,7 +39,7 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   # Go through each channel and get information ############################
   for(i in 1:number_of_channels){
 
-    # Filter for channel name
+    # Filter for channel Id
     look_for <- paste(".//Dimensions/Channels/Channel[@Id='", channel_ids[i], "']", sep="")
     channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
     channel_information <- xml2::as_list(channel_information)
@@ -80,9 +81,9 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     "dim_x" = NA,
     "dim_y" = NA,
     "dim_z" = NA,
-    "scaling_x" = NA,
-    "scaling_y" = NA,
-    "scaling_z" = NA,
+    "scaling_x_in_um" = NA,
+    "scaling_y_in_um" = NA,
+    "scaling_z_in_um" = NA,
     "acquisition_mode" = acquisition_mode,
     "illumination_type" = illumination_type,
     "exposure_time_1" = exposure_times[1],
