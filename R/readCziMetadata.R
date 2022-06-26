@@ -298,6 +298,7 @@ readCziMetadata <- function(input_file = NULL,
   if(color_axis == "0"){
     # Type of microscope: AxioImager or Axio Image.M2
     df_metadata <- readCziMetadata_AxioImager(metadata, number_of_channels)
+
     # Type of microscope: LSM (in wide field acquisition mode)
   }else if(color_axis == "C" &&
            #grepl(pattern = "<AcquisitionMode>WideField</AcquisitionMode>",x = metadata, ignore.case = TRUE)

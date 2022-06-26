@@ -86,7 +86,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   # Get scene information ##################################################
 
   # Filter for scene information
-  if(grepl(pattern = "Scenes", x = metadata_XML, ignore.case = TRUE)){
+  if(grepl(pattern = "<Scenes", x = metadata_XML, ignore.case = TRUE)){
     if(grepl(pattern = "Scene Index=\"1\"", x = metadata_XML, ignore.case = TRUE)){
       print("Please split the scenes before using this package.")
       return()
@@ -95,6 +95,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
       scenes_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
 
       scene_name <- unique(xml2::xml_attr(x = scenes_information, attr = "Name"))
+
 
       scenes_information <- xml2::as_list(scenes_information)
 
@@ -192,13 +193,16 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   }
 
   # Recalculate if numbers are not in the right unit
-  excitation_wavelengths_in_nm[excitation_wavelengths_in_nm < 1e-6] <-
+  excitation_wavelengths_in_nm[!is.na(excitation_wavelengths_in_nm) &
+                                 excitation_wavelengths_in_nm < 1e-6] <-
     excitation_wavelengths_in_nm[excitation_wavelengths_in_nm < 1e-6] * 1e9
 
-  emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] <-
+  emission_wavelengths_in_nm[!is.na(emission_wavelengths_in_nm) &
+                               emission_wavelengths_in_nm < 1e-6] <-
     emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] * 1e9
 
-  illumination_wavelengths_in_nm[illumination_wavelengths_in_nm < 1e-6] <-
+  illumination_wavelengths_in_nm[!is.na(illumination_wavelengths_in_nm) &
+                                   illumination_wavelengths_in_nm < 1e-6] <-
     illumination_wavelengths_in_nm[illumination_wavelengths_in_nm < 1e-6] * 1e9
 
   # Put information into a data frame
