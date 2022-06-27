@@ -253,13 +253,13 @@ readCzi <- function(input_file = NULL) {
 
     }else if(length(dim(copy_image_loaded)) == 5){
 
-      if(rgb_layers[1] != 0){
+      if(!is.na(rgb_layers[1]) & rgb_layers[1] != 0){
         image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,]
       }
-      if(rgb_layers[2] != 0){
+      if(!is.na(rgb_layers[2]) & rgb_layers[2] != 0){
         image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,]
       }
-      if(rgb_layers[3] != 0){
+      if(!is.na(rgb_layers[3]) & rgb_layers[3] != 0){
         image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,]
       }
 
