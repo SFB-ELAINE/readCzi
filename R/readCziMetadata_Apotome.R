@@ -13,10 +13,23 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   # Channel names
   look_for <- paste(".//Channel", sep="")
   channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+
+  xml2::xml_attr(x = channel_information, attr = "Name")
+
   channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
 
+  # Check different source for channel names if the number of names
+  # does not match the number of channels
   if(number_of_channels != length(channel_names)){
-    print("The number of channels does not correspond to the number of channel names in the metadata.")
+
+    look_for <- paste(".//DisplaySetting/Channels/Channel", sep="")
+    channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+    channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+
+    if(number_of_channels != length(channel_names)){
+      print("The number of channels does not correspond to the number of channel names in the metadata.")
+      return()
+    }
   }
 
   # Empty vectors
@@ -120,7 +133,8 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   # Sorting the channels information regarding wavelength ------------------
   channel_order <- order(illumination_wavelengths_in_nm)
 
-  if(!all.equal(c(1,2,3), channel_order)){
+  order_of_channels <- 1:number_of_channels
+  if(!all.equal(order_of_channels, channel_order)){
 
     acquisition_mode_copy <- acquisition_mode
     illumination_type_copy <- illumination_type
