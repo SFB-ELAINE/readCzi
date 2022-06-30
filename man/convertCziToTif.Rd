@@ -18,7 +18,8 @@ convertCziToTif(
   higher_contrast_slices = FALSE,
   higher_contrast_stack = TRUE,
   normalize_stack = TRUE,
-  change_layers = "none"
+  change_layers = "none",
+  add_scale_bar = TRUE
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ of the z-stack or original image if it is not a z stack)}
 \item{normalize_stack}{A logical (T/F for normalizing intensities of stack)}
 
 \item{change_layers}{A character (either "none" or, e.g., "green<->red")}
+
+\item{add_scale_bar}{A logic (add scale bar to all images that are saved
+if true)}
 }
 \description{
 Imports czi file and save them as tif

@@ -18,6 +18,8 @@
 #' of the z-stack or original image if it is not a z stack)
 #' @param normalize_stack A logical (T/F for normalizing intensities of stack)
 #' @param change_layers A character (either "none" or, e.g., "green<->red")
+#' @param add_scale_bar A logic (add scale bar to all images that are saved
+#' if true)
 
 # TODO: stack_method: average OR max (instead of maxprojection)
 
@@ -28,7 +30,8 @@ convertCziToTif <- function(input_file = NULL,
                             higher_contrast_slices = FALSE,
                             higher_contrast_stack = TRUE,
                             normalize_stack = TRUE,
-                            change_layers = "none") {
+                            change_layers = "none",
+                            add_scale_bar = TRUE) {
   if(is.null(input_file)){
     print("Please call function with input file.")
     return()
@@ -43,7 +46,7 @@ convertCziToTif <- function(input_file = NULL,
 
   # Load image and convert it to Image class -------------------------------
   # Dimensions of the image: 1: row, 2: col, 3: channels (r,g,b), 4: z-layer,
-  image_data <- readCzi(input_file = input_file)
+  image_data <- readCzi::readCzi(input_file = input_file)
   dim_z <- dim(image_data)[4]
 
   # Drop z-layer of multidimensional array if dim_z == 1
@@ -92,11 +95,27 @@ convertCziToTif <- function(input_file = NULL,
   # Convert to EBImage
   Image_Data <- EBImage::Image(data = image_data, colormode = "Color")
 
+  # Save length per pixel in x-direction
+  df_metadata <- readCzi::readCziMetadata(input_file = input_file, save_metadata = FALSE)
+  length_per_pixel_x_in_um <- df_metadata$scaling_x_in_um[1]
+
+  # Check that pixels in x and y direction have the same lengths
+  length_per_pixel_y_in_um <- df_metadata$scaling_y_in_um[1]
+
+  if(length_per_pixel_x_in_um != length_per_pixel_y_in_um){
+    print("Dimension in x- and y-directions are different! ERROR!")
+  }
+
   # Save all slices --------------------------------------------------------
 
   if(dim_z > 1 && convert_all_slices){
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], ".tif", sep="")
+
+    if(add_scale_bar){
+      Image_Data <- addScaleBar(image = Image_Data,
+                                length_per_pixel = length_per_pixel_x_in_um)
+    }
 
     EBImage::writeImage(x = Image_Data, files = tif_file_names, type = "tiff", bits.per.sample = 8)
   }
@@ -108,12 +127,22 @@ convertCziToTif <- function(input_file = NULL,
                                stack_method = stack_method)
 
     stack_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack.tif", sep="")
+
+    if(add_scale_bar){
+      Image_Stack <- addScaleBar(image = Image_Stack,
+                                length_per_pixel = length_per_pixel_x_in_um)
+    }
     EBImage::writeImage(x = Image_Stack, files = stack_file_name, type = "tiff", bits.per.sample = 8)
 
   }else{
     # Not a z-stack image (dim_z==1)
 
     output_file_name <- paste(output_dir, "/", image_name_wo_czi, ".tif", sep="")
+
+    if(add_scale_bar){
+      Image_Data <- addScaleBar(image = Image_Data,
+                                 length_per_pixel = length_per_pixel_x_in_um)
+    }
     EBImage::writeImage(x = Image_Data, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
   }
@@ -128,6 +157,10 @@ convertCziToTif <- function(input_file = NULL,
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], "_histogram_equalized.tif", sep="")
 
+    if(add_scale_bar){
+      Image_Data <- addScaleBar(image = Image_Data,
+                                length_per_pixel = length_per_pixel_x_in_um)
+    }
     EBImage::writeImage(x = Image_Data, files = tif_file_names, type = "tiff", bits.per.sample = 8)
 
   }
@@ -145,6 +178,10 @@ convertCziToTif <- function(input_file = NULL,
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_histogram_equalized.tif", sep="")
     }
 
+    if(add_scale_bar){
+      Image_Stack_histogram_equalization <- addScaleBar(image = Image_Stack_histogram_equalization,
+                                length_per_pixel = length_per_pixel_x_in_um)
+    }
     EBImage::writeImage(x = Image_Stack_histogram_equalization, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
   }
@@ -194,6 +231,10 @@ convertCziToTif <- function(input_file = NULL,
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_histogram_equalized_normalized.tif", sep="")
     }
 
+    if(add_scale_bar){
+      Image_Stack_normalized <- addScaleBar(image = Image_Stack_normalized,
+                                            length_per_pixel = length_per_pixel_x_in_um)
+    }
     EBImage::writeImage(x = Image_Stack_normalized, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
   }
