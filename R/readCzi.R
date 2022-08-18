@@ -232,7 +232,31 @@ readCzi <- function(input_file = NULL) {
       image_loaded[,,-which(rgb_layers == 0),] <- copy_image_loaded
     }
 
-    if(length(dim(copy_image_loaded)) == 8){
+    if(length(dim(copy_image_loaded)) == 12){
+      if(!is.na(rgb_layers[1]) && rgb_layers[1] != 0){
+        image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,,,,,]
+      }
+      if(!is.na(rgb_layers[2]) && rgb_layers[2] != 0){
+        image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,,,,,,,,]
+      }
+      if(!is.na(rgb_layers[3]) && rgb_layers[3] != 0){
+        image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,,,,,,]
+      }
+
+      # Check if the resulting array contains as many entries as needed
+      if(dim_z == 1){
+        check_array_dims <- length(new_array_order) + 1
+      }else{
+        check_array_dims <- length(new_array_order)
+      }
+
+      # Check if the resulting array contains as many entries as needed
+      if(length(dim(image_loaded)) != check_array_dims){
+        print("There is more or less information than thought in the image.")
+        return()
+      }
+
+    }else if(length(dim(copy_image_loaded)) == 8){
       if(!is.na(rgb_layers[1]) && rgb_layers[1] != 0){
         image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,]
       }
@@ -317,7 +341,7 @@ readCzi <- function(input_file = NULL) {
 
 
     }else{
-      print("The dimensions of the image does not fit.")
+      print("The dimensions of the image (array) do not fit. Check readCzi.R.")
     }
 
   }else if(color_axis == "0"){
