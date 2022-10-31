@@ -61,6 +61,10 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     # Exposure Time
     if(grepl(pattern = "ExposureTime", x = channel_information, ignore.case = TRUE)){
       exposure_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
+
+      if(exposure_times_in_ms[i] > 1e6){
+        exposure_times_in_ms[i] <- exposure_times_in_ms[i]/1e6
+      }
     }
 
     # Fluorphore
@@ -86,9 +90,9 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     "scaling_z_in_um" = NA,
     "acquisition_mode" = acquisition_mode,
     "illumination_type" = illumination_type,
-    "exposure_time_1" = exposure_times_in_ms[1],
-    "exposure_time_2" = exposure_times_in_ms[2],
-    "exposure_time_3" = exposure_times_in_ms[3],
+    "exposure_time_1_in_ms" = exposure_times_in_ms[1],
+    "exposure_time_2_in_ms" = exposure_times_in_ms[2],
+    "exposure_time_3_in_ms" = exposure_times_in_ms[3],
     "channel_name_1" = channel_names[1],
     "channel_name_2" = channel_names[2],
     "channel_name_3" = channel_names[3],

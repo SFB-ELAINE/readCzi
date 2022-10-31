@@ -112,12 +112,15 @@ convertCziToTif <- function(input_file = NULL,
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], ".tif", sep="")
 
+    Image_Data <- Image_Data_copy
     if(add_scale_bar){
       Image_Data <- addScaleBar(image = Image_Data,
                                 length_per_pixel = length_per_pixel_x_in_um)
     }
 
     EBImage::writeImage(x = Image_Data, files = tif_file_names, type = "tiff", bits.per.sample = 8)
+    Image_Data_copy <- Image_Data
+    rm(Image_Data_copy)
   }
 
   # Save z-stack or original image (with z=1) ------------------------------
@@ -128,23 +131,28 @@ convertCziToTif <- function(input_file = NULL,
 
     stack_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack.tif", sep="")
 
+    Image_Stack_copy <- Image_Stack
     if(add_scale_bar){
       Image_Stack <- addScaleBar(image = Image_Stack,
                                 length_per_pixel = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Stack, files = stack_file_name, type = "tiff", bits.per.sample = 8)
-
+    Image_Stack <- Image_Stack_copy
+    rm(Image_Stack_copy)
   }else{
     # Not a z-stack image (dim_z==1)
 
     output_file_name <- paste(output_dir, "/", image_name_wo_czi, ".tif", sep="")
 
+    Image_Data_copy <- Image_Data
     if(add_scale_bar){
       Image_Data <- addScaleBar(image = Image_Data,
                                  length_per_pixel = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Data, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
+    Image_Data <- Image_Data_copy
+    rm(Image_Data_copy)
   }
 
 
@@ -157,12 +165,15 @@ convertCziToTif <- function(input_file = NULL,
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], "_histogram_equalized.tif", sep="")
 
+    Image_Data_copy <- Image_Data
     if(add_scale_bar){
       Image_Data <- addScaleBar(image = Image_Data,
                                 length_per_pixel = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Data, files = tif_file_names, type = "tiff", bits.per.sample = 8)
 
+    Image_Data <- Image_Data_copy
+    rm(Image_Data_copy)
   }
 
   # Enhance contrast of z-stack ------------------------------------------
@@ -178,12 +189,15 @@ convertCziToTif <- function(input_file = NULL,
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_histogram_equalized.tif", sep="")
     }
 
+    Image_Stack_histogram_equalization_copy <- Image_Stack_histogram_equalization
     if(add_scale_bar){
       Image_Stack_histogram_equalization <- addScaleBar(image = Image_Stack_histogram_equalization,
                                 length_per_pixel = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Stack_histogram_equalization, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
+    Image_Stack_histogram_equalization <- Image_Stack_histogram_equalization_copy
+    rm(Image_Stack_histogram_equalization_copy)
   }
 
   # Normalize contrast of enhanced z-stack ---------------------------------
@@ -231,12 +245,15 @@ convertCziToTif <- function(input_file = NULL,
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_histogram_equalized_normalized.tif", sep="")
     }
 
+    Image_Stack_normalized_copy <- Image_Stack_normalized
     if(add_scale_bar){
       Image_Stack_normalized <- addScaleBar(image = Image_Stack_normalized,
                                             length_per_pixel = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Stack_normalized, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
+    Image_Stack_normalized <- Image_Stack_normalized_copy
+    rm(Image_Stack_normalized_copy)
   }
 
 }

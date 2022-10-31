@@ -25,7 +25,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
   detection_wavelength_end_in_nm <- rep(x = NA, number_of_channels)
   excitation_wavelengths_in_nm <- rep(x = NA, number_of_channels)
   emission_wavelengths_in_nm <- rep(x = NA, number_of_channels)
-  laser_scan_pixel_times <- rep(x = NA, number_of_channels)
+  laser_scan_pixel_times_in_ms <- rep(x = NA, number_of_channels)
+  laser_scan_line_times_in_ms <- rep(x = NA, number_of_channels)
+  laser_scan_frame_times_in_ms <- rep(x = NA, number_of_channels)
   averaging <- rep(x = NA, number_of_channels)
   laser_scan_zoom_x <- rep(x = NA, number_of_channels)
   laser_scan_zoom_y <- rep(x = NA, number_of_channels)
@@ -71,7 +73,24 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
     # Laser scan pixel times
     if(grepl(pattern = "PixelTime", x = channel_information, ignore.case = TRUE)){
-      laser_scan_pixel_times[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$PixelTime))
+      laser_scan_pixel_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$PixelTime))
+      if(laser_scan_pixel_times_in_ms[i] < 1e-3){
+        laser_scan_pixel_times_in_ms[i] <- laser_scan_pixel_times_in_ms[i]*1e6
+      }
+    }
+    # Laser scan line times
+    if(grepl(pattern = "LineTime", x = channel_information, ignore.case = TRUE)){
+      laser_scan_line_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$LineTime))
+      if(laser_scan_line_times_in_ms[i] < 1e-3){
+        laser_scan_line_times_in_ms[i] <- laser_scan_line_times_in_ms[i]*1e6
+      }
+    }
+    # Laser scan fame times
+    if(grepl(pattern = "FrameTime", x = channel_information, ignore.case = TRUE)){
+      laser_scan_frame_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$FrameTime))
+      if(laser_scan_frame_times_in_ms[i] < 1e-3){
+        laser_scan_frame_times_in_ms[i] <- laser_scan_frame_times_in_ms[i]*1e6
+      }
     }
 
     # Laser scan averaging
@@ -112,7 +131,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
   detection_wavelength_end_copy <- detection_wavelength_end_in_nm
   excitation_wavelengths_copy <- excitation_wavelengths_in_nm
   emission_wavelengths_copy <- emission_wavelengths_in_nm
-  laser_scan_pixel_times_copy <- laser_scan_pixel_times
+  laser_scan_pixel_times_in_ms_copy <- laser_scan_pixel_times_in_ms
+  laser_scan_line_times_in_ms_copy <- laser_scan_line_times_in_ms
+  laser_scan_frame_times_in_ms_copy <- laser_scan_frame_times_in_ms
   averaging_copy <- averaging
   laser_scan_zoom_x_copy <- laser_scan_zoom_x
   laser_scan_zoom_y_copy <- laser_scan_zoom_y
@@ -127,7 +148,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
     detection_wavelength_end_in_nm[i] <- detection_wavelength_end_copy[channel_order[i]]
     excitation_wavelengths_in_nm[i] <- excitation_wavelengths_copy[channel_order[i]]
     emission_wavelengths_in_nm[i] <- emission_wavelengths_copy[channel_order[i]]
-    laser_scan_pixel_times[i] <- laser_scan_pixel_times_copy[channel_order[i]]
+    laser_scan_pixel_times_in_ms[i] <- laser_scan_pixel_times_in_ms_copy[channel_order[i]]
+    laser_scan_line_times_in_ms[i] <- laser_scan_line_times_in_ms_copy[channel_order[i]]
+    laser_scan_frame_times_in_ms[i] <- laser_scan_frame_times_in_ms_copy[channel_order[i]]
     averaging[i] <- averaging_copy[channel_order[i]]
     laser_scan_zoom_x[i] <- laser_scan_zoom_x_copy[channel_order[i]]
     laser_scan_zoom_y[i] <- laser_scan_zoom_y_copy[channel_order[i]]
@@ -289,9 +312,15 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "emission_wavelength_1_in_nm"= emission_wavelengths_in_nm[1],
     "emission_wavelength_2_in_nm"= emission_wavelengths_in_nm[2],
     "emission_wavelength_3_in_nm"= emission_wavelengths_in_nm[3],
-    "laser_scan_pixel_time_1" = laser_scan_pixel_times[1],
-    "laser_scan_pixel_time_2" = laser_scan_pixel_times[2],
-    "laser_scan_pixel_time_3" = laser_scan_pixel_times[3],
+    "laser_scan_pixel_time_1_in_ms" = laser_scan_pixel_times_in_ms[1],
+    "laser_scan_pixel_time_2_in_ms" = laser_scan_pixel_times_in_ms[2],
+    "laser_scan_pixel_time_3_in_ms" = laser_scan_pixel_times_in_ms[3],
+    "laser_scan_line_time_1_in_ms" = laser_scan_line_times_in_ms[1],
+    "laser_scan_line_time_2_in_ms" = laser_scan_line_times_in_ms[2],
+    "laser_scan_line_time_3_in_ms" = laser_scan_line_times_in_ms[3],
+    "laser_scan_frame_time_1_in_ms" = laser_scan_frame_times_in_ms[1],
+    "laser_scan_frame_time_2_in_ms" = laser_scan_frame_times_in_ms[2],
+    "laser_scan_frame_time_3_in_ms" = laser_scan_frame_times_in_ms[3],
     "laser_scan_averaging_1" = averaging[1],
     "laser_scan_averaging_2" = averaging[2],
     "laser_scan_averaging_3" = averaging[3],

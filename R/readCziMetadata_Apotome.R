@@ -90,7 +90,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     if(grepl(pattern = "ExposureTime", x = channel_information, ignore.case = TRUE)){
       exposure_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
 
-      if(exposure_times_in_ms[i] > 1e60){
+      if(exposure_times_in_ms[i] > 1e6){
         exposure_times_in_ms[i] <- exposure_times_in_ms[i]/1e6
       }
     }
@@ -271,9 +271,9 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     "light_source_intensity_1" =  light_source_intensities[1],
     "light_source_intensity_2" =  light_source_intensities[2],
     "light_source_intensity_3" =  light_source_intensities[3],
-    "exposure_time_1" = exposure_times_in_ms[1],
-    "exposure_time_2" = exposure_times_in_ms[2],
-    "exposure_time_3" = exposure_times_in_ms[3]
+    "exposure_time_1_in_ms" = exposure_times_in_ms[1],
+    "exposure_time_2_in_ms" = exposure_times_in_ms[2],
+    "exposure_time_3_in_ms" = exposure_times_in_ms[3]
   )
 
   return(df_metadata)
