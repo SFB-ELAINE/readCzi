@@ -52,7 +52,7 @@ require(readCzi)
 # Using the readCzi package for plain conversion ###########################
 
 # Input file ---------------------------------------------------------------
-input_file <- "examples/output_readme/AxioImager_Test.czi"
+input_file <- "examples/AxioImager_Test.czi"
 
 # Writing dataframe with metadata and converting czi to tif ----------------
 
@@ -77,7 +77,7 @@ convertCziToTif(input_file = input_file)
 # Using the readCzi package for converting mulptiple z-stack layers ########
 
 # Input file ---------------------------------------------------------------
-input_file <- "examples/output_readme/LSM_twoChannels.czi"
+input_file <- "examples/LSM_twoChannels.czi"
 
 
 # Converting every layer of a z-stack czi file into a tif file -------------
