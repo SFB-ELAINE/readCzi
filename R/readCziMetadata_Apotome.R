@@ -38,8 +38,8 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   excitation_wavelengths_in_nm <- rep(x = NA, number_of_channels)
   emission_wavelengths_in_nm <- rep(x = NA, number_of_channels)
   illumination_wavelengths_in_nm <- rep(x = NA, number_of_channels)
-  light_source_intensitys <- rep(x = NA, number_of_channels)
-  exposure_times <- rep(x = NA, number_of_channels)
+  light_source_intensities <- rep(x = NA, number_of_channels)
+  exposure_times_in_ms <- rep(x = NA, number_of_channels)
   fluorophores <- rep(x = NA, number_of_channels)
 
   # Go through each channel and get information ############################
@@ -79,16 +79,20 @@ readCziMetadata_Apotome <- function(metadata = metadata,
       illumination_wavelengths_in_nm[i] <- as.numeric(unlist(channel_information[[1]]$IlluminationWavelength$SinglePeak))
     }
     if(grepl(pattern = "LightSourceSettings", x = channel_information, ignore.case = TRUE)){
-      dump_light_source_intensitys <- unlist(channel_information[[1]]$LightSourcesSettings$LightSourceSettings$Intensity)
-      dump_light_source_intensitys <- gsub(pattern = "\\%", replacement = "", x = dump_light_source_intensitys)
-      dump_light_source_intensitys <- gsub(pattern = " ", replacement = "", x = dump_light_source_intensitys)
-      light_source_intensitys[i] <- as.numeric(dump_light_source_intensitys)
-      rm(dump_light_source_intensitys)
+      dump_light_source_intensities <- unlist(channel_information[[1]]$LightSourcesSettings$LightSourceSettings$Intensity)
+      dump_light_source_intensities <- gsub(pattern = "\\%", replacement = "", x = dump_light_source_intensities)
+      dump_light_source_intensities <- gsub(pattern = " ", replacement = "", x = dump_light_source_intensities)
+      light_source_intensities[i] <- as.numeric(dump_light_source_intensities)
+      rm(dump_light_source_intensities)
     }
 
     # Exposure Time
     if(grepl(pattern = "ExposureTime", x = channel_information, ignore.case = TRUE)){
-      exposure_times[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
+      exposure_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
+
+      if(exposure_times_in_ms[i] > 1e60){
+        exposure_times_in_ms[i] <- exposure_times_in_ms[i]/1e6
+      }
     }
 
     # Fluorphore
@@ -141,7 +145,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     illumination_wavelengths_copy <- illumination_wavelengths_in_nm
     excitation_wavelengths_copy <- excitation_wavelengths_in_nm
     emission_wavelengths_copy <- emission_wavelengths_in_nm
-    light_source_intensitys_copy <- light_source_intensitys
+    light_source_intensities_copy <- light_source_intensities
     fluorophores_copy <- fluorophores
 
     for(i in 1:number_of_channels){
@@ -150,7 +154,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
       illumination_wavelengths_in_nm[i] <- illumination_wavelengths_copy[channel_order[i]]
       excitation_wavelengths_in_nm[i] <- excitation_wavelengths_copy[channel_order[i]]
       emission_wavelengths_in_nm[i] <- emission_wavelengths_copy[channel_order[i]]
-      light_source_intensitys[i] <- light_source_intensitys_copy[channel_order[i]]
+      light_source_intensities[i] <- light_source_intensities_copy[channel_order[i]]
       fluorophores[i] <- fluorophores_copy[channel_order[i]]
     }
   }
@@ -264,12 +268,12 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     "emission_wavelength_1_in_nm" =  emission_wavelengths_in_nm[1],
     "emission_wavelength_2_in_nm" =  emission_wavelengths_in_nm[2],
     "emission_wavelength_3_in_nm" =  emission_wavelengths_in_nm[3],
-    "light_source_intensity_1" =  light_source_intensitys[1],
-    "light_source_intensity_2" =  light_source_intensitys[2],
-    "light_source_intensity_3" =  light_source_intensitys[3],
-    "exposure_time_1" = exposure_times[1],
-    "exposure_time_2" = exposure_times[2],
-    "exposure_time_3" = exposure_times[3]
+    "light_source_intensity_1" =  light_source_intensities[1],
+    "light_source_intensity_2" =  light_source_intensities[2],
+    "light_source_intensity_3" =  light_source_intensities[3],
+    "exposure_time_1" = exposure_times_in_ms[1],
+    "exposure_time_2" = exposure_times_in_ms[2],
+    "exposure_time_3" = exposure_times_in_ms[3]
   )
 
   return(df_metadata)

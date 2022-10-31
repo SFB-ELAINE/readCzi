@@ -32,8 +32,8 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   excitation_wavelengths <- rep(x = NA, number_of_channels)
   emission_wavelengths <- rep(x = NA, number_of_channels)
   illumination_wavelengths <- rep(x = NA, number_of_channels)
-  light_source_intensitys <- rep(x = NA, number_of_channels)
-  exposure_times <- rep(x = NA, number_of_channels)
+  light_source_intensities <- rep(x = NA, number_of_channels)
+  exposure_times_in_ms <- rep(x = NA, number_of_channels)
   fluorophores <- rep(x = NA, number_of_channels)
 
   # Go through each channel and get information ############################
@@ -60,7 +60,7 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
 
     # Exposure Time
     if(grepl(pattern = "ExposureTime", x = channel_information, ignore.case = TRUE)){
-      exposure_times[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
+      exposure_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$ExposureTime))
     }
 
     # Fluorphore
@@ -86,9 +86,9 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     "scaling_z_in_um" = NA,
     "acquisition_mode" = acquisition_mode,
     "illumination_type" = illumination_type,
-    "exposure_time_1" = exposure_times[1],
-    "exposure_time_2" = exposure_times[2],
-    "exposure_time_3" = exposure_times[3],
+    "exposure_time_1" = exposure_times_in_ms[1],
+    "exposure_time_2" = exposure_times_in_ms[2],
+    "exposure_time_3" = exposure_times_in_ms[3],
     "channel_name_1" = channel_names[1],
     "channel_name_2" = channel_names[2],
     "channel_name_3" = channel_names[3],
