@@ -98,64 +98,64 @@ The results are the following:
 **1. AxioImager_Test.czi**
 
   * Original image:
-    ![Original converted AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_AxioImager_Test/AxioImager_Test_small.jpg?raw=true)
+    ![Original converted AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_AxioImager_Test/AxioImager_Test_small.jpg?raw=true)
   
   * Histogram equalized image (using the clahe (Contrast Limited Adaptive Histogram Equalization) method of the [EBImage R package](https://rdrr.io/bioc/EBImage/man/clahe.html)):
-    ![Histogram equalized AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_AxioImager_Test/AxioImager_Test_histogram_equalized_small.jpg?raw=true)
+    ![Histogram equalized AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_AxioImager_Test/AxioImager_Test_histogram_equalized_small.jpg?raw=true)
   
   * Normalized image (normalizing each channel separately):
-    ![Normalized AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_AxioImager_Test/AxioImager_Test_normalized_small.jpg?raw=true)
+    ![Normalized AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_AxioImager_Test/AxioImager_Test_normalized_small.jpg?raw=true)
   
 **2. LSM_Test_twoChannels.czi**
 
   * Original images (layers + z-stack (average method)):
   
     * Z-stack (average method):
-    ![Original converted LSM image (z-stack)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_zstack_small.jpg?raw=true)
+    ![Original converted LSM image (z-stack)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_zstack_small.jpg?raw=true)
     
     * Layer 1:
-    ![Original converted LSM image (layer 1)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z1_small.jpg?raw=true)
+    ![Original converted LSM image (layer 1)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z1_small.jpg?raw=true)
     
     * Layer 2:
-    ![Original converted LSM image (layer 2)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z2_small.jpg?raw=true)
+    ![Original converted LSM image (layer 2)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z2_small.jpg?raw=true)
     
     * Layer 3:
-    ![Original converted LSM image (layer 3)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z3_small.jpg?raw=true)
+    ![Original converted LSM image (layer 3)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z3_small.jpg?raw=true)
     
     * Layer 4:
-    ![Original converted LSM image (layer 4)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z4_small.jpg?raw=true)
+    ![Original converted LSM image (layer 4)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z4_small.jpg?raw=true)
     
     * Layer 5:
-    ![Original converted LSM image (layer 5)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z5_small.jpg?raw=true)
+    ![Original converted LSM image (layer 5)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z5_small.jpg?raw=true)
     
     * Layer 6:
-    ![Original converted LSM image (layer 6)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z6_small.jpg?raw=true)
+    ![Original converted LSM image (layer 6)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z6_small.jpg?raw=true)
     
     * Layer 7:
-    ![Original converted LSM image (layer 7)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z7_small.jpg?raw=true)
+    ![Original converted LSM image (layer 7)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z7_small.jpg?raw=true)
     
     * Layer 8:
-    ![Original converted LSM image (layer 8)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z8_small.jpg?raw=true)
+    ![Original converted LSM image (layer 8)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z8_small.jpg?raw=true)
     
     * Layer 9:
-    ![Original converted LSM image (layer 9)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z9_small.jpg?raw=true)
+    ![Original converted LSM image (layer 9)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z9_small.jpg?raw=true)
     
     * Layer 10:
-    ![Original converted LSM image (layer 10)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z10_small.jpg?raw=true)
+    ![Original converted LSM image (layer 10)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z10_small.jpg?raw=true)
     
     * Layer 11:
-    ![Original converted LSM image (layer 11)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z11_small.jpg?raw=true)
+    ![Original converted LSM image (layer 11)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z11_small.jpg?raw=true)
     
     * Layer 12:
-    ![Original converted LSM image (layer 12)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z12_small.jpg?raw=true)
+    ![Original converted LSM image (layer 12)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z12_small.jpg?raw=true)
     
     * Layer 13:
-    ![Original converted LSM image (layer 13)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_z13_small.jpg?raw=true)
+    ![Original converted LSM image (layer 13)](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_z13_small.jpg?raw=true)
 
   * Histogram equalized z-stack image (using the clahe method of the [EBImage R package](https://rdrr.io/bioc/EBImage/man/clahe.html)):
-    ![Histogram equalized LSM z-stack image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_zstack_histogram_equalized_small.jpg?raw=true)
+    ![Histogram equalized LSM z-stack image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_zstack_histogram_equalized_small.jpg?raw=true)
   
   * Normalized image (normalizing each channel separately):
-    ![Normalized LSM z-stack image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_LSM_twoChannels/LSM_twoChannels_zstack_normalized_small.jpg?raw=true)
+    ![Normalized LSM z-stack image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_LSM_twoChannels/LSM_twoChannels_zstack_normalized_small.jpg?raw=true)
 
 (The jpgs were created with GIMP.)
