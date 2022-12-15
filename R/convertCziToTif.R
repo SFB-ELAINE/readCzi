@@ -7,6 +7,7 @@
 #' @author Kai Budde
 #' @export convertCziToTif
 #' @param input_file A character (path to czi file to be converted)
+#' @param output_dir A character (name of output directory)
 #' @param convert_all_slices A logical (T/F for converting and saving all
 #' z-slices)
 #' @param stack_image A logical (T/F for calculating a z-stack)
@@ -24,6 +25,7 @@
 # TODO: stack_method: average OR max (instead of maxprojection)
 
 convertCziToTif <- function(input_file = NULL,
+                            output_dir = "output",
                             convert_all_slices = FALSE,
                             stack_image = TRUE,
                             stack_method = "average",
@@ -41,7 +43,7 @@ convertCziToTif <- function(input_file = NULL,
   directory_of_file <- dirname(input_file)
   file_name <- basename(input_file)
   image_name_wo_czi <- gsub("\\.czi", "", file_name)
-  output_dir <- paste(directory_of_file, "/output", sep="")
+  output_dir <- file.path(directory_of_file, output_dir)
   dir.create(output_dir, showWarnings = FALSE)
 
   # Load image and convert it to Image class -------------------------------
