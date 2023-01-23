@@ -33,6 +33,7 @@ readCziMetadata_Apotome <- function(metadata = metadata,
   }
 
   # Empty vectors
+  contrast_method <- rep(x = NA, number_of_channels)
   acquisition_mode <- rep(x = NA, number_of_channels)
   illumination_type <- rep(x = NA, number_of_channels)
   excitation_wavelengths_in_nm <- rep(x = NA, number_of_channels)
@@ -49,6 +50,11 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     look_for <- paste(".//Dimensions/Channels/Channel[@Name='", channel_names[i], "']", sep="")
     channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
     channel_information <- xml2::as_list(channel_information)
+
+    # Contrast Method
+    if(grepl(pattern = "ContrastMethod", x = channel_information, ignore.case = TRUE)){
+      contrast_method[i] <- unlist(channel_information[[1]]$ContrastMethod)
+    }
 
     # Acquisition Mode
     if(grepl(pattern = "AcquisitionMode", x = channel_information, ignore.case = TRUE)){
@@ -239,6 +245,9 @@ readCziMetadata_Apotome <- function(metadata = metadata,
     "scaling_x_in_um" = NA,
     "scaling_y_in_um" = NA,
     "scaling_z_in_um" = NA,
+    "contrast_method_1" = contrast_method[1],
+    "contrast_method_2" = contrast_method[2],
+    "contrast_method_3" = contrast_method[3],
     "blue_channel" = channel_color[1],
     "green_channel" = channel_color[2],
     "red_channel" = channel_color[3],
