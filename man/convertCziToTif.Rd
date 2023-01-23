@@ -12,6 +12,7 @@
 \usage{
 convertCziToTif(
   input_file = NULL,
+  output_dir = "output",
   convert_all_slices = FALSE,
   stack_image = TRUE,
   stack_method = "average",
@@ -24,6 +25,8 @@ convertCziToTif(
 }
 \arguments{
 \item{input_file}{A character (path to czi file to be converted)}
+
+\item{output_dir}{A character (name of output directory)}
 
 \item{convert_all_slices}{A logical (T/F for converting and saving all
 z-slices)}

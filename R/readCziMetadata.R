@@ -164,12 +164,12 @@ readCziMetadata <- function(input_file = NULL,
   # Scaling (in um)
   if(grepl(pattern = "scalingX", x = metadata, ignore.case = TRUE)){
     scaling_x_in_um <- gsub(pattern = ".+<ScalingX>(.+)</ScalingX>.+",
-                      replacement = "\\1", x = metadata)
+                            replacement = "\\1", x = metadata)
     scaling_x_in_um <- tolower(scaling_x_in_um)
     scaling_x_in_um <- as.numeric(scaling_x_in_um)
   }else if(grepl(pattern = "<Distance Id=\"X\">", x = metadata, ignore.case = TRUE)){
     scaling_x_in_um <- gsub(pattern = ".+<Distance Id=\"X\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
-                      replacement = "\\1", x = metadata)
+                            replacement = "\\1", x = metadata)
     scaling_x_in_um <- tolower(scaling_x_in_um)
     scaling_x_in_um <- as.numeric(scaling_x_in_um)
   }else{
@@ -182,12 +182,12 @@ readCziMetadata <- function(input_file = NULL,
 
   if(grepl(pattern = "ScalingY", x = metadata, ignore.case = TRUE)){
     scaling_y_in_um <- gsub(pattern = ".+<ScalingY>(.+)</ScalingY>.+",
-                      replacement = "\\1", x = metadata)
+                            replacement = "\\1", x = metadata)
     scaling_y_in_um <- tolower(scaling_y_in_um)
     scaling_y_in_um <- as.numeric(scaling_y_in_um)
   }else if(grepl(pattern = "<Distance Id=\"Y\">", x = metadata, ignore.case = TRUE)){
     scaling_y_in_um <- gsub(pattern = ".+<Distance Id=\"Y\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
-                      replacement = "\\1", x = metadata)
+                            replacement = "\\1", x = metadata)
     scaling_y_in_um <- tolower(scaling_y_in_um)
     scaling_y_in_um <- as.numeric(scaling_y_in_um)
   }else{
@@ -201,12 +201,12 @@ readCziMetadata <- function(input_file = NULL,
 
   if(grepl(pattern = "ScalingZ", x = metadata, ignore.case = TRUE)){
     scaling_z_in_um <- gsub(pattern = ".+<ScalingZ>(.+)</ScalingZ>.+",
-                      replacement = "\\1", x = metadata)
+                            replacement = "\\1", x = metadata)
     scaling_z_in_um <- tolower(scaling_z_in_um)
     scaling_z_in_um <- as.numeric(scaling_z_in_um)
   }else if(grepl(pattern = "<Distance Id=\"Z\">", x = metadata, ignore.case = TRUE)){
     scaling_z_in_um <- gsub(pattern = ".+<Distance Id=\"Z\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
-                      replacement = "\\1", x = metadata)
+                            replacement = "\\1", x = metadata)
     scaling_z_in_um <- tolower(scaling_z_in_um)
     scaling_z_in_um <- as.numeric(scaling_z_in_um)
   }else{
@@ -299,17 +299,25 @@ readCziMetadata <- function(input_file = NULL,
     # Type of microscope: AxioImager or Axio Image.M2
     df_metadata <- readCziMetadata_AxioImager(metadata, number_of_channels)
 
-    # Type of microscope: LSM (in wide field acquisition mode)
-  }else if(color_axis == "C" &&
-           #grepl(pattern = "<AcquisitionMode>WideField</AcquisitionMode>",x = metadata, ignore.case = TRUE)
-           grepl(pattern = "WideField", x = metadata_XML_list)){
+  }else if(# Type of microscope: LSM (in wide field acquisition mode)
+    color_axis == "C" &&
+    #grepl(pattern = "<AcquisitionMode>WideField</AcquisitionMode>",x = metadata, ignore.case = TRUE)
+    grepl(pattern = "WideField", x = metadata_XML_list)){
     df_metadata <- readCziMetadata_Apotome(metadata, number_of_channels)
 
-    # Type of microscope: LSM (in confocal acquisition mode)
-    }else if(color_axis == "C" &&
-             #grepl(pattern = "<AcquisitionMode>LaserScanningConfocalMicroscopy</AcquisitionMode>",x = metadata, ignore.case = TRUE)
-             grepl(pattern = "LaserScanningConfocalMicroscopy", x = metadata_XML_list)){
+  }else if(# Type of microscope: LSM using also photo multiplier tubes (PMT)
+    color_axis == "C" &&
+    grepl(pattern = "LaserScanningConfocalMicroscopy", x = metadata_XML_list) &&
+    grepl(pattern = "PMT", x = metadata_XML_list)){
+    df_metadata <- readCziMetadata_LSM_PMT(metadata, number_of_channels)
+
+  }else if(# Type of microscope: LSM (in confocal acquisition mode)
+    color_axis == "C" &&
+
+    #grepl(pattern = "<AcquisitionMode>LaserScanningConfocalMicroscopy</AcquisitionMode>",x = metadata, ignore.case = TRUE)
+    grepl(pattern = "LaserScanningConfocalMicroscopy", x = metadata_XML_list)){
     df_metadata <- readCziMetadata_LSM(metadata, number_of_channels)
+
   }else{
     print("Microscope could not be identified.")
     return()

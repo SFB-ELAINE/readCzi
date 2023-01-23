@@ -1,10 +1,10 @@
-#' Check for LSM-specific values in metadata
+#' Check for data of LSM using also photo multiplier tubes (PMT)
 #' @param metadata A character (loaded metadata in a string)
 #' @param number_of_channels A number
 #' @keywords internal
 
-readCziMetadata_LSM <- function(metadata = metadata,
-                                number_of_channels = number_of_channels) {
+readCziMetadata_LSM_PMT <- function(metadata = metadata,
+                                    number_of_channels = number_of_channels) {
 
   metadata_XML <- xml2::read_xml(x = metadata)
 
@@ -42,9 +42,12 @@ readCziMetadata_LSM <- function(metadata = metadata,
   laser_name <- rep(x = NA, number_of_channels)
   laser_power <- rep(x = NA, number_of_channels)
 
+  # Get all (non-)PMT channels
+  PMT_channels <- which(grepl(pattern = "pmt", x = channel_names, ignore.case = TRUE))
+  LSM_channels <- which(!grepl(pattern = "pmt", x = channel_names, ignore.case = TRUE))
 
-  # Go through each channel and get information
-  for(i in 1:number_of_channels){
+  # Go through each LSM channel and get information
+  for(i in LSM_channels){
 
     # Filter for channel name ----------------------------------------------
     look_for <- paste(".//Dimensions/Channels/Channel[@Name='", channel_names[i], "']", sep="")
@@ -129,6 +132,72 @@ readCziMetadata_LSM <- function(metadata = metadata,
   }
   rm(i)
 
+  # Go through each PMT channel and get information
+  for(i in PMT_channels){
+
+    # Filter for channel name ----------------------------------------------
+    look_for <- paste(".//Dimensions/Channels/Channel[@Name='", channel_names[i], "']", sep="")
+    channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+    channel_information <- xml2::as_list(channel_information)
+
+    # Contrast Method
+    if(grepl(pattern = "ContrastMethod", x = channel_information, ignore.case = TRUE)){
+      contrast_method[i] <- unlist(channel_information[[1]]$ContrastMethod)
+    }
+
+    # Laser scan pixel times
+    if(grepl(pattern = "PixelTime", x = channel_information, ignore.case = TRUE)){
+      laser_scan_pixel_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$PixelTime))
+      if(laser_scan_pixel_times_in_ms[i] < 1e-3){
+        laser_scan_pixel_times_in_ms[i] <- laser_scan_pixel_times_in_ms[i]*1e6
+      }
+    }
+    # Laser scan line times
+    if(grepl(pattern = "LineTime", x = channel_information, ignore.case = TRUE)){
+      laser_scan_line_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$LineTime))
+      if(laser_scan_line_times_in_ms[i] < 1e-3){
+        laser_scan_line_times_in_ms[i] <- laser_scan_line_times_in_ms[i]*1e6
+      }
+    }
+    # Laser scan fame times
+    if(grepl(pattern = "FrameTime", x = channel_information, ignore.case = TRUE)){
+      laser_scan_frame_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$FrameTime))
+      if(laser_scan_frame_times_in_ms[i] < 1e-3){
+        laser_scan_frame_times_in_ms[i] <- laser_scan_frame_times_in_ms[i]*1e6
+      }
+    }
+
+    # Laser scan averaging
+    if(grepl(pattern = "Averaging", x = channel_information, ignore.case = TRUE)){
+      averaging[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$Averaging))
+    }
+
+    # Laser scan zoom
+    if(grepl(pattern = "ZoomX", x = channel_information, ignore.case = TRUE)){
+      laser_scan_zoom_x[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$ZoomX))
+    }
+    if(grepl(pattern = "ZoomY", x = channel_information, ignore.case = TRUE)){
+      laser_scan_zoom_y[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$ZoomY))
+    }
+
+    # Detector settings
+
+    if(grepl(pattern = "PhotonConversionFactor", x = channel_information, ignore.case = TRUE)){
+      photon_conversion_factors[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$PhotonConversionFactor))
+    }
+    if(grepl(pattern = "Gain", x = channel_information, ignore.case = TRUE)){
+      detector_gain[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$Gain))
+    }
+    if(grepl(pattern = "DigitalGain", x = channel_information, ignore.case = TRUE)){
+      digital_gain[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$DigitalGain))
+    }
+    if(grepl(pattern = "Offset", x = channel_information, ignore.case = TRUE)){
+      amplifier_offset[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$Offset))
+    }
+
+
+  }
+
   # Sorting the channels information regarding wavelength ------------------
   channel_order <- order(detection_wavelength_start_in_nm)
 
@@ -186,14 +255,19 @@ readCziMetadata_LSM <- function(metadata = metadata,
     laser_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
     laser_information <- xml2::as_list(laser_information)
 
-    if(grepl(pattern = "Wavelength", x = laser_information, ignore.case = TRUE)){
+    if(length(laser_information) > 0){
+      if(grepl(pattern = "Wavelength", x = laser_information, ignore.case = TRUE)){
 
-      laser_wavelength_in_nm[i] <- as.numeric(unlist(laser_information[[1]]$Wavelength))
+        laser_wavelength_in_nm[i] <- as.numeric(unlist(laser_information[[1]]$Wavelength))
+      }
+
+      if(grepl(pattern = "Transmission", x = laser_information, ignore.case = TRUE)){
+        laser_transmission[i] <- as.numeric(unlist(laser_information[[1]]$Transmission))
+      }
+
     }
 
-    if(grepl(pattern = "Transmission", x = laser_information, ignore.case = TRUE)){
-      laser_transmission[i] <- as.numeric(unlist(laser_information[[1]]$Transmission))
-    }
+
   }
 
   rm(i)
@@ -244,42 +318,40 @@ readCziMetadata_LSM <- function(metadata = metadata,
 
         }
       }else{
+        if(!is.na(detection_wavelength_start_in_nm[i])){
+          if(detection_wavelength_start_in_nm[i] < (blue_limit-50)){
+            # Finding the blue channel
+            channel_color[1] <- channel_order[i]
 
-        if(detection_wavelength_start_in_nm[i] < (blue_limit-50)){
-          # Finding the blue channel
-          channel_color[1] <- channel_order[i]
+          }else if(detection_wavelength_start_in_nm[i] > (red_limit-50)){
+            # Finding the red channel
+            channel_color[3] <- channel_order[i]
 
-        }else if(detection_wavelength_start_in_nm[i] > (red_limit-50)){
-          # Finding the red channel
-          channel_color[3] <- channel_order[i]
+          }else{
+            # Finding the green channel
+            channel_color[2] <- channel_order[i]
 
-        }else{
-          # Finding the green channel
-          channel_color[2] <- channel_order[i]
-
+          }
         }
       }
-
-
     }
-
   }
 
   # Recalculate if numbers are not in the right unit
   detection_wavelength_start_in_nm[detection_wavelength_start_in_nm < 1e-6] <-
     detection_wavelength_start_in_nm[detection_wavelength_start_in_nm < 1e-6] * 1e9
 
-  detection_wavelength_end_in_nm[detection_wavelength_end_in_nm < 1e-6] <-
-    detection_wavelength_end_in_nm[detection_wavelength_end_in_nm < 1e-6] * 1e9
+  detection_wavelength_end_in_nm[!is.na(detection_wavelength_end_in_nm) && detection_wavelength_end_in_nm < 1e-6] <-
+    detection_wavelength_end_in_nm[!is.na(detection_wavelength_end_in_nm) && detection_wavelength_end_in_nm < 1e-6] * 1e9
 
-  excitation_wavelengths_in_nm[excitation_wavelengths_in_nm < 1e-6] <-
-    excitation_wavelengths_in_nm[excitation_wavelengths_in_nm < 1e-6] * 1e9
+  excitation_wavelengths_in_nm[!is.na(excitation_wavelengths_in_nm) && excitation_wavelengths_in_nm < 1e-6] <-
+    excitation_wavelengths_in_nm[!is.na(excitation_wavelengths_in_nm) && excitation_wavelengths_in_nm < 1e-6] * 1e9
 
-  emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] <-
-    emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] * 1e9
+  emission_wavelengths_in_nm[!is.na(emission_wavelengths_in_nm) && emission_wavelengths_in_nm < 1e-6] <-
+    emission_wavelengths_in_nm[!is.na(emission_wavelengths_in_nm) && emission_wavelengths_in_nm < 1e-6] * 1e9
 
-  laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] <-
-    laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] * 1e9
+  laser_wavelength_in_nm[!is.na(laser_wavelength_in_nm) && laser_wavelength_in_nm < 1e-6] <-
+    laser_wavelength_in_nm[!is.na(laser_wavelength_in_nm) && laser_wavelength_in_nm < 1e-6] * 1e9
 
   # Put information into a data frame
   df_metadata <- data.frame(
