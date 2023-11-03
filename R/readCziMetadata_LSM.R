@@ -1,25 +1,136 @@
 #' Check for LSM-specific values in metadata
 #' @param metadata A character (loaded metadata in a string)
 #' @param number_of_channels A number
+#' @param number_of_tracks A number
 #' @keywords internal
 
-readCziMetadata_LSM <- function(metadata = metadata,
-                                number_of_channels = number_of_channels) {
+readCziMetadata_LSM <- function(metadata = NULL,
+                                number_of_channels = NULL,
+                                number_of_tracks = NULL) {
 
-  metadata_XML <- xml2::read_xml(x = metadata)
+  # Default values for missing arguments ###################################
+  if(is.null(metadata) ||
+     is.null(number_of_channels) ||
+     is.null(number_of_tracks)){
+    print(paste("Please call the function correctly.", sep=""))
+    return()
+  }
 
   # Get information of laser scanning microscopes ##########################
+  metadata_XML <- xml2::read_xml(x = metadata)
 
-  # Channel names
-  look_for <- paste(".//Channel", sep="")
-  channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-  channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+  # # Channel names
+  # look_for <- paste(".//Channel", sep="")
+  # channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+  # channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+  #
+  # if(number_of_channels != length(channel_names)){
+  #   print("The number of channels does not correspond to the number of channel names in the metadata.")
+  # }
 
-  if(number_of_channels != length(channel_names)){
+  # Empty tibble with channel info
+  df_channel_info <- tibble::tibble(track_id = rep(NA, number_of_channels),
+                                    channel_id = rep(NA, number_of_channels),
+                                    channel_name = rep(NA, number_of_channels))
+
+  # Go through each track and write down channels
+  tracks_information <- xml2::xml_find_all(x = metadata_XML, xpath = ".//Tracks/Track")
+  tracks_ids <- unique(xml2::xml_attr(x = tracks_information, attr = "Id"))
+
+  for(i in 1:length(tracks_ids)){
+    # Find all channels belonging to a track
+    current_track <- tracks_ids[i]
+    current_track_information <- xml2::xml_find_all(
+      x = metadata_XML,
+      xpath = paste0(".//Tracks/Track[@Id='",current_track,"']"))
+    channel_refs <- xml2::xml_attr(x = xml2::xml_find_all(
+      x = current_track_information, xpath = ".//ChannelRef"),
+      attr = "Id")
+
+    # Fill tibble
+    first_empty_row <- which(is.na(df_channel_info$channel_id))[1]
+
+    df_channel_info$track_id[
+      first_empty_row:(first_empty_row+length(channel_refs)-1)] <- current_track
+
+    df_channel_info$channel_id[
+      first_empty_row:(first_empty_row+length(channel_refs)-1)] <- channel_refs
+  }
+
+  rm(i)
+
+  # Go through all channel ids and add channel names
+  for(i in 1:length(df_channel_info$channel_id)){
+    current_channel_id <- df_channel_info$channel_id[i]
+    current_channel_information <- xml2::xml_find_all(
+      x = metadata_XML,
+      xpath = paste0(".//Dimensions/Channels/Channel[@Id='",
+                     current_channel_id, "']"))
+    current_channel_name <- xml2::xml_attr(x = current_channel_information,
+                                           attr = "Name")
+    df_channel_info$channel_name[
+      df_channel_info$channel_id == current_channel_id] <- current_channel_name
+  }
+
+  if(number_of_channels != sum(!is.na(df_channel_info$channel_name))){
     print("The number of channels does not correspond to the number of channel names in the metadata.")
   }
 
+  channel_names <- df_channel_info$channel_name
+
+
+
+  # # Channel names
+  #
+  # channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+  # df_channel_info$channel_name <- channel_names
+  # rm(channel_names)
+  #
+  # channel_ids <- unique(xml2::xml_attr(x = channel_information, attr = "Id"))
+  # df_channel_info$channel_id <- channel_ids
+  # rm(channel_ids)
+  #
+  # # Corresponding tracks
+  #
+  #
+  # match(df_channel_info$channel_id, channel_ref)
+  # for(i in 1:length(channel_ref)){
+  #   df_channel_info$channel_id == channel_ref[i]
+  # }
+
+
+
+  # # Detector types
+  # detector_types <- rep("", length(channel_ids))
+  # detector_ids   <- rep("", length(channel_ids))
+  #
+  # for(i in 1:length(channel_ids)){
+  #
+  #   detector_id <- xml2::xml_find_all(
+  #     x = metadata_XML,
+  #     xpath = paste0(".//Channels/Channel[@Id = '", channel_ids[i],
+  #                    "']/DetectorSettings/Detector"))
+  #   detector_id <- unique(xml2::xml_attr(x = detector_id, attr = "Id"))
+  #   detector_ids[i] <- detector_id
+  #
+  #   detector_type <- xml2::xml_find_all(
+  #     x = metadata_XML,
+  #     xpath = paste0(".//Detectors/Detector[@Id = '", detector_id,
+  #                    "']/Type"))
+  #   if(length(detector_type)>0){
+  #     detector_types[i] <- unlist(xml2::as_list(detector_type))
+  #   }
+  # }
+  # rm(list = c("i", "detector_type", "detector_id", "channel_information"))
+
+  # # Get all (non-)PMT channels
+  # PMT_channels <- which(grepl(pattern = "pmt", x = detector_types, ignore.case = TRUE))
+  # LSM_channels <- which(!grepl(pattern = "pmt", x = detector_types, ignore.case = TRUE))
+
+  # Get channel information ------------------------------------------------
+
   # Empty vectors
+  detector_identifier <- rep(x = NA, number_of_channels)
   contrast_method <- rep(x = NA, number_of_channels)
   fluorophores <- rep(x = NA, number_of_channels)
   detection_wavelength_start_in_nm <- rep(x = NA, number_of_channels)
@@ -37,62 +148,62 @@ readCziMetadata_LSM <- function(metadata = metadata,
   digital_gain <- rep(x = NA, number_of_channels)
   amplifier_offset <- rep(x = NA, number_of_channels)
 
-  laser_wavelength_in_nm <- rep(x = NA, number_of_channels)
-  laser_transmission <- rep(x = NA, number_of_channels)
-  laser_name <- rep(x = NA, number_of_channels)
-  laser_power <- rep(x = NA, number_of_channels)
-
-
   # Go through each channel and get information
   for(i in 1:number_of_channels){
 
-    # Filter for channel name ----------------------------------------------
-    look_for <- paste(".//Dimensions/Channels/Channel[@Name='", channel_names[i], "']", sep="")
+    # Filter for channel ID
+    look_for <- paste(".//Dimensions/Channels/Channel[@Id='", df_channel_info$channel_id[i], "']", sep="")
     channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
     channel_information <- xml2::as_list(channel_information)
 
     # Contrast Method
-    if(grepl(pattern = "ContrastMethod", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$ContrastMethod))){
       contrast_method[i] <- unlist(channel_information[[1]]$ContrastMethod)
     }
 
     # Fluorphore
-    fluorophores[i] <- unlist(channel_information[[1]]$Fluor)
+    if(!is.null(unlist(channel_information[[1]]$Fluor))){
+      fluorophores[i] <- unlist(channel_information[[1]]$Fluor)
+    }
 
     # Detection wavelengths
-    detection_wavelength_start_in_nm[i] <- as.numeric(unlist(
-      strsplit(
-        x = unlist(channel_information[[1]]$DetectionWavelength$Ranges),
-        split = "-"))[1])
-    detection_wavelength_end_in_nm[i] <- as.numeric(unlist(
-      strsplit(
-        x = unlist(channel_information[[1]]$DetectionWavelength$Ranges),
-        split = "-"))[2])
+    if(!is.null(unlist(channel_information[[1]]$DetectionWavelength$Ranges))){
+      detection_wavelength_start_in_nm[i] <- as.numeric(unlist(
+        strsplit(
+          x = unlist(channel_information[[1]]$DetectionWavelength$Ranges),
+          split = "-"))[1])
+      detection_wavelength_end_in_nm[i] <- as.numeric(unlist(
+        strsplit(
+          x = unlist(channel_information[[1]]$DetectionWavelength$Ranges),
+          split = "-"))[2])
+    }
+
 
     # Excitation and emission wavelengths
-    if(grepl(pattern = "ExcitationWavelength", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$ExcitationWavelength))){
       excitation_wavelengths_in_nm[i] <- as.numeric(unlist(channel_information[[1]]$ExcitationWavelength))
     }
-    if(grepl(pattern = "EmissionWavelength", x = channel_information, ignore.case = TRUE)){
+
+    if(!is.null(unlist(channel_information[[1]]$EmissionWavelength))){
       emission_wavelengths_in_nm[i] <- as.numeric(unlist(channel_information[[1]]$EmissionWavelength))
     }
 
     # Laser scan pixel times
-    if(grepl(pattern = "PixelTime", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$LaserScanInfo$PixelTime))){
       laser_scan_pixel_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$PixelTime))
       if(laser_scan_pixel_times_in_ms[i] < 1e-3){
         laser_scan_pixel_times_in_ms[i] <- laser_scan_pixel_times_in_ms[i]*1e6
       }
     }
     # Laser scan line times
-    if(grepl(pattern = "LineTime", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$LaserScanInfo$LineTime))){
       laser_scan_line_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$LineTime))
       if(laser_scan_line_times_in_ms[i] < 1e-3){
         laser_scan_line_times_in_ms[i] <- laser_scan_line_times_in_ms[i]*1e6
       }
     }
     # Laser scan fame times
-    if(grepl(pattern = "FrameTime", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$LaserScanInfo$FrameTime))){
       laser_scan_frame_times_in_ms[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$FrameTime))
       if(laser_scan_frame_times_in_ms[i] < 1e-3){
         laser_scan_frame_times_in_ms[i] <- laser_scan_frame_times_in_ms[i]*1e6
@@ -100,32 +211,42 @@ readCziMetadata_LSM <- function(metadata = metadata,
     }
 
     # Laser scan averaging
-    if(grepl(pattern = "Averaging", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$LaserScanInfo$Averaging))){
       averaging[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$Averaging))
     }
 
     # Laser scan zoom
-    if(grepl(pattern = "ZoomX", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$LaserScanInfo$ZoomX))){
       laser_scan_zoom_x[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$ZoomX))
     }
-    if(grepl(pattern = "ZoomY", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$LaserScanInfo$ZoomY))){
       laser_scan_zoom_y[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$ZoomY))
     }
 
     # Detector settings
-
-    if(grepl(pattern = "PhotonConversionFactor", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$DetectorSettings$PhotonConversionFactor))){
       photon_conversion_factors[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$PhotonConversionFactor))
     }
-    if(grepl(pattern = "Gain", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$DetectorSettings$Gain))){
       detector_gain[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$Gain))
     }
-    if(grepl(pattern = "DigitalGain", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$DetectorSettings$DigitalGain))){
       digital_gain[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$DigitalGain))
     }
-    if(grepl(pattern = "Offset", x = channel_information, ignore.case = TRUE)){
+    if(!is.null(unlist(channel_information[[1]]$DetectorSettings$Offset))){
       amplifier_offset[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$Offset))
     }
+
+    # Get detector identifier
+    look_for <- paste(".//Detector[@Id='", df_channel_info$channel_id[i], "']", sep="")
+    detector_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+    detector_information <- xml2::xml_find_all(x = detector_information, xpath = ".//DetectorIdentifier")
+
+    # Contrast Method
+    if(length(detector_information)>0){
+      detector_identifier[i] <- xml2::xml_text(x = detector_information)
+    }
+
   }
   rm(i)
 
@@ -167,33 +288,66 @@ readCziMetadata_LSM <- function(metadata = metadata,
   }
   rm(i)
 
-  # Filter for experiment --------------------------------------------------
+  # Get experiment tracks information --------------------------------------
 
-  for(i in 1:number_of_channels){
-    look_for <- paste(".//Experiment", sep="")
-    experiment_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-    experiment_information <- xml2::as_list(experiment_information)
+  # Empty vectors
+  laser_wavelength_in_nm <- rep(x = NA, number_of_channels)
+  laser_transmission <- rep(x = NA, number_of_channels)
+  laser_name <- rep(x = NA, number_of_channels)
+  laser_power_in_mW <- rep(x = NA, number_of_channels)
 
-    if(grepl(pattern = "LaserName", x = experiment_information, ignore.case = TRUE)){
-      laser_name[i] <- unlist(experiment_information[[1]]$ExperimentBlocks$AcquisitionBlock$Lasers[i]$Laser$LaserName)
+
+  look_for <- paste0(".//Experiment")
+  # multitrack_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+  experiment_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+
+  tracksetup_information <- xml2::xml_find_all(x = experiment_information, xpath = ".//TrackSetup")
+  track_names <- xml2::xml_attr(x = tracksetup_information, attr = "Name")
+
+  # channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+  # channel_information <- xml2::as_list(channel_information)
+
+  for(i in 1:number_of_tracks){
+
+    current_track_name <- track_names[i]
+
+    current_track_information <- tracksetup_information[i]
+    # current_track_information <- xml2::as_list(current_track_information)
+
+    current_laser <- xml2::xml_find_all(x = current_track_information,
+                                        xpath = ".//Laser")
+
+    laser_name[i] <- xml2::xml_text(x = current_laser)
+
+    laserpowers <- xml2::xml_find_all(x = experiment_information,
+                                      xpath = ".//Lasers/Laser/LaserPower")
+    laserpowers <- xml2::xml_double(x = laserpowers)
+
+    lasernames <- xml2::xml_find_all(x = experiment_information,
+                                     xpath = ".//Lasers/Laser/LaserName")
+    lasernames <- xml2::xml_text(x = lasernames)
+
+    if(laser_name[i] %in% lasernames){
+      # Laser power in mW
+      laser_power_in_mW[i] <- laserpowers[which(lasernames == laser_name[i])]
     }
-    if(grepl(pattern = "LaserPower", x = experiment_information, ignore.case = TRUE)){
-      laser_power[i] <- as.numeric(unlist(
-        experiment_information[[1]]$ExperimentBlocks$AcquisitionBlock$Lasers[i]$Laser$LaserPower))
+
+    wavelength <- xml2::xml_find_all(x = current_track_information,
+                                     xpath = ".//Wavelength")
+    wavelength <- xml2::xml_double(wavelength)
+
+    if(length(wavelength)>0){
+      laser_wavelength_in_nm[i] <- wavelength*1e9
     }
 
-    look_for <- paste(".//Attenuators/Attenuator[Laser='", laser_name[i], "']", sep="")
-    laser_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-    laser_information <- xml2::as_list(laser_information)
+    lasertransmission <- xml2::xml_find_all(x = current_track_information,
+                                            xpath = ".//Transmission")
+    lasertransmission <- xml2::xml_double(lasertransmission)
 
-    if(grepl(pattern = "Wavelength", x = laser_information, ignore.case = TRUE)){
-
-      laser_wavelength_in_nm[i] <- as.numeric(unlist(laser_information[[1]]$Wavelength))
+    if(length(lasertransmission)>0){
+      laser_transmission[i] <- lasertransmission
     }
 
-    if(grepl(pattern = "Transmission", x = laser_information, ignore.case = TRUE)){
-      laser_transmission[i] <- as.numeric(unlist(laser_information[[1]]$Transmission))
-    }
   }
 
   rm(i)
@@ -202,13 +356,13 @@ readCziMetadata_LSM <- function(metadata = metadata,
   experiment_order <- order(laser_wavelength_in_nm)
 
   laser_name_copy <- laser_name
-  laser_power_copy <- laser_power
+  laser_power_in_mW_copy <- laser_power_in_mW
   laser_wavelength_copy <- laser_wavelength_in_nm
   laser_transmission_copy <- laser_transmission
 
   for(i in 1:number_of_channels){
     laser_name[i] <- laser_name_copy[experiment_order[i]]
-    laser_power[i] <- laser_power_copy[experiment_order[i]]
+    laser_power_in_mW[i] <- laser_power_in_mW_copy[experiment_order[i]]
     laser_wavelength_in_nm[i] <- laser_wavelength_copy[experiment_order[i]]
     laser_transmission[i] <- laser_transmission_copy[experiment_order[i]]
   }
@@ -216,7 +370,7 @@ readCziMetadata_LSM <- function(metadata = metadata,
   # Finding the color of each channel and the corresponding chan number ----
 
   # Upper and lower limits of emission wavelengths to determine the colors
-  red_limit <- 600 #>600nmnm
+  red_limit <- 600 #>600nm
   # green: #>= 500nm and <= 600nm
   blue_limit <- 500 #< 500nm
 
@@ -245,24 +399,23 @@ readCziMetadata_LSM <- function(metadata = metadata,
         }
       }else{
 
-        if(detection_wavelength_start_in_nm[i] < (blue_limit-50)){
-          # Finding the blue channel
-          channel_color[1] <- channel_order[i]
+        if(!is.na(detection_wavelength_start_in_nm[i])){
+          if(detection_wavelength_start_in_nm[i] < (blue_limit-50)){
+            # Finding the blue channel
+            channel_color[1] <- channel_order[i]
 
-        }else if(detection_wavelength_start_in_nm[i] > (red_limit-50)){
-          # Finding the red channel
-          channel_color[3] <- channel_order[i]
+          }else if(detection_wavelength_start_in_nm[i] > (red_limit-50)){
+            # Finding the red channel
+            channel_color[3] <- channel_order[i]
 
-        }else{
-          # Finding the green channel
-          channel_color[2] <- channel_order[i]
+          }else{
+            # Finding the green channel
+            channel_color[2] <- channel_order[i]
 
+          }
         }
       }
-
-
     }
-
   }
 
   # Recalculate if numbers are not in the right unit
@@ -287,8 +440,12 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "acquisition_date" = NA,
     "acquisition_time" = NA,
     "microscopy_system" = NA,
+    "detector_identifier_1" = detector_identifier[1],
+    "detector_identifier_2" = detector_identifier[2],
+    "detector_identifier_3" = detector_identifier[3],
     "color_system" = NA,
     "number_of_channels" = NA,
+    "number_of_tracks" = NA,
     "objective_magnification" = NA,
     "objective" = NA,
     "dim_x" = NA,
@@ -357,9 +514,9 @@ readCziMetadata_LSM <- function(metadata = metadata,
     "laser_name_1" = laser_name[1],
     "laser_name_2" = laser_name[2],
     "laser_name_3" = laser_name[3],
-    "laser_power_1" = laser_power[1],
-    "laser_power_2" = laser_power[2],
-    "laser_power_3" = laser_power[3],
+    "laser_power_in_mW_1" = laser_power_in_mW[1],
+    "laser_power_in_mW_2" = laser_power_in_mW[2],
+    "laser_power_in_mW_3" = laser_power_in_mW[3],
     "laser_transmission_1" = laser_transmission[1],
     "laser_transmission_2" = laser_transmission[2],
     "laser_transmission_3" = laser_transmission[3]
