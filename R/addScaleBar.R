@@ -18,18 +18,6 @@ addScaleBar <- function(image = NULL,
                         distance_from_border = 20,
                         number_size_factor = 1){
 
-  # if(class(image) == "EBImage"){
-  #   # Convert to array for faster manipulation
-  #   image <- as.array(image)
-  #   image_was_EBImage <- TRUE
-  # }else{
-  #   image_was_EBImage <- FALSE
-  # }
-
-
-  # dim_x <- dim(image)[2]
-  # dim_y <- dim(image)[1]
-  # dim_c <- dim(image)[3]
   dim_x <- dim(image)[1]
   dim_y <- dim(image)[2]
   dim_c <- dim(image)[3]
@@ -63,9 +51,6 @@ addScaleBar <- function(image = NULL,
   heigth_scale_bar_pixels <- as.integer(round(dim_y/150))
 
   # Add the scale_bar
-  # image[(dim_y-distance_from_border-heigth_scale_bar_pixels):(dim_y-distance_from_border),
-  #       (dim_x-distance_from_border-length_scale_bar_pixels):(dim_x-distance_from_border),
-  #       1:dim_c] <- 1
   if(dim_z == 1){
     image[(dim_x-distance_from_border-length_scale_bar_pixels):(dim_x-distance_from_border),
           (dim_y-distance_from_border-heigth_scale_bar_pixels):(dim_y-distance_from_border),
@@ -78,8 +63,6 @@ addScaleBar <- function(image = NULL,
 
 
   # Add length of scale bar and unit
-  # number_pos_x <- dim_y-distance_from_border-heigth_scale_bar_pixels
-  # number_pos_y <- dim_x-distance_from_border-0.5*length_scale_bar_pixels
   number_pos_x <- dim_x-distance_from_border-0.5*length_scale_bar_pixels
   number_pos_y <- dim_y-distance_from_border-heigth_scale_bar_pixels
 
@@ -89,9 +72,6 @@ addScaleBar <- function(image = NULL,
 
   scale_legend_image <- EBImage::readImage(files = scale_legend_path,
                                            type = "tiff")
-  # scale_legend_image <- tiff::readTIFF(source = scale_legend_path,
-  #                                      convert = TRUE,
-  #                                      info = FALSE)
 
   # Only keep the black layer
   scale_legend_image <- scale_legend_image[,,4]
@@ -103,27 +83,10 @@ addScaleBar <- function(image = NULL,
 
   dim_legend_x <- dim(scale_legend_image)[1]
   dim_legend_y <- dim(scale_legend_image)[2]
-  # dim_legend_x <- dim(scale_legend_image)[1]
-  # dim_legend_y <- dim(scale_legend_image)[2]
 
   # Add number images to image
   start_x <- floor(dim_x-distance_from_border-0.5*length_scale_bar_pixels-0.5*dim_legend_x)
   start_y <- floor(dim_y-distance_from_border-heigth_scale_bar_pixels-1.1*dim_legend_y)
-  # start_x <- dim_x-distance_from_border-0.5*length_scale_bar_pixels-0.5*dim_legend_x
-  # start_y <- dim_y-distance_from_border-heigth_scale_bar_pixels-1.1*dim_legend_y
-
-  # for(row in 1:dim_legend_y){
-  #   for(col in 1:dim_legend_x){
-
-  # for(col in 1:dim_legend_x){
-  #   for(row in 1:dim_legend_y){
-  #     if(scale_legend_image[row, col] > 0){
-  #       # if(scale_legend_image[col, row] > 0){
-  #       # image[start_y+row, start_x+col, 1:dim_c] <- scale_legend_image[row, col]
-  #       image[start_x+col, start_y+row, 1:dim_c] <- scale_legend_image[row, col]
-  #     }
-  #   }
-  # }
 
   # Add \um image to original image
   scale_legend_image_copy <- scale_legend_image
@@ -132,22 +95,16 @@ addScaleBar <- function(image = NULL,
   if(dim_z == 1){
     scale_legend_image[start_x:(start_x+dim_legend_x-1),
                        start_y:(start_y+dim_legend_y-1),] <-
-      # EBImage::transpose(scale_legend_image_copy)
       scale_legend_image_copy
   }else{
     scale_legend_image[start_x:(start_x+dim_legend_x-1),
                        start_y:(start_y+dim_legend_y-1),,] <-
-      # EBImage::transpose(scale_legend_image_copy)
       scale_legend_image_copy
   }
 
 
   image <- scale_legend_image + image
   image[image > 1] <- 1
-
-  # if(image_was_EBImage){
-  #   image <- EBImage::Image(data = image_data, colormode = "Color")
-  # }
 
   return(image)
 }

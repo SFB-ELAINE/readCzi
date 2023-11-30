@@ -141,53 +141,6 @@ readCzi <- function(input_file = NULL) {
 
     color_axis <- "C"
 
-    # if(number_of_channels == 3){
-    #   wavelengths <- gsub(
-    #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-    #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-    #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-    #                      sep=""),
-    #     replacement = "\\1,\\2,\\3",
-    #     x = metadata)
-    # }else if(number_of_channels == 2){
-    #   wavelengths <- gsub(
-    #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-    #                      ".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-    #                      sep=""),
-    #     replacement = "\\1,\\2",
-    #     x = metadata)
-    # }else if(number_of_channels == 1){
-    #   wavelengths <- gsub(
-    #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
-    #                      sep=""),
-    #     replacement = "\\1",
-    #     x = metadata)
-    # }
-
-    # wavelengths <- as.numeric(strsplit(wavelengths, split = ",")[[1]])
-
-    # Upper and lower limits of wavelengths to determine the colors
-    # red: > 600nm
-    # green: >= 500nm and <= 600nm
-    # blue: < 500nm
-
-    # upper_limit_blue <- 450#500
-    # lower_limit_red <- 550#600
-    #
-    # test_red <- any(wavelengths > lower_limit_red)
-    # red_id <- ifelse(test = test_red, yes = which(wavelengths > lower_limit_red), no = 0)
-    # if(length(red_id) > 1){print("More than one red channel!?")}
-    #
-    # test_green <- any( (upper_limit_blue) <= wavelengths & (wavelengths <= lower_limit_red))
-    # green_id <- ifelse(test = test_green, yes = which((upper_limit_blue <= wavelengths) & (wavelengths <= lower_limit_red)), no = 0)
-    # if(length(green_id) > 1){print("More than one green channel!?")}
-    #
-    # test_blue <- any(wavelengths < upper_limit_blue)
-    # blue_id <- ifelse(test = test_blue, yes = which(upper_limit_blue > wavelengths), no = 0)
-    # if(length(blue_id) > 1){print("More than one blue channel!?")}
-#
-#     rgb_layers <- c(red_id, green_id, blue_id)
-
     rgb_layers <- c(df_metadata$red_channel,
                     df_metadata$green_channel,
                     df_metadata$blue_channel)
@@ -275,9 +228,6 @@ readCzi <- function(input_file = NULL) {
     # Reorganize the array according according to: "X","Y", "C"/"0", "Z"
     new_array_order <- c("X", "Y", color_axis, "Z")
   }else{
-    # print(paste("The image is one-dimensional in z-direction (no z-stack).",
-    #             sep=""))
-
     # Reorganize the array according according to: "X","Y", "C"/"0"
     new_array_order <- c("X", "Y", color_axis)
   }
@@ -299,10 +249,6 @@ readCzi <- function(input_file = NULL) {
     # not existing colors
     copy_image_loaded <- image_loaded
     image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 3, dim_z))
-
-    # if(number_of_channels != 3){
-    #   image_loaded[,,-which(rgb_layers == 0),] <- copy_image_loaded
-    # }
 
     # Copy image layers in the correct order depending on which dimension
     # the original image has
@@ -377,13 +323,6 @@ readCzi <- function(input_file = NULL) {
         check_array_dims <- length(new_array_order)
       }
 
-      # # Remove z dimension in array if it is 1
-      # if(!zstack){
-      #   # Drop all arrays with dim=1
-      #   image_loaded <- drop(image_loaded)
-      # }
-
-
       if(length(dim(image_loaded)) != check_array_dims){
         print("There is more or less information than thought in the image.")
         return()
@@ -436,12 +375,6 @@ readCzi <- function(input_file = NULL) {
   }else{
     print(paste("There is no color axis.", sep=""))
   }
-
-  # Check if we have a (Transmitted light detector (T-PMT)) which needs to
-  # be saved in a different color (to not overwrite the other ones)
-
-  # Reverse y-axis (It will go from top to bottom instead from bottom to top)
-  #image_loaded <- EBImage::flip(image_loaded)
 
   rm(copy_image_loaded)
 

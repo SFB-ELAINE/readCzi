@@ -1,15 +1,24 @@
 Package: readCzi
 Type: Package
-Title: Read czi image files, convert them to tifs, and save metadata
-Version: 0.2.3
-Author: c(person("Kai", "Budde", email = "kai.budde@uni-rostock.de",
-    role = c("aut", "cre"))
-Maintainer: Kai Budde <kai.budde@uni-rostock.de>
-Description: This package may read (z-stack) czi image data, edit them,
-    and store the results in the tif-format. The metadata is also read and
-    saved and transformed into a data frame.
-License: LICENSE
+Title: Read CZI image files, convert them to tifs, and save metadata
+Version: 0.3.0
+Authors@R: person("Kai", "Budde-Sagert", email = "kai.budde-sagert@uni-rostock.de",
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6836-9865"))
+Maintainer: Kai Budde-Sagert <kai.budde-sagert@uni-rostock.de>
+Description: The package reads (z-stack) CZI microscopy files, edits them,
+    and stores the results in the tif format. The metadata is also read,
+    transformed into a tibble, and saved as a CSV file.
+URL: https://github.com/SFB-ELAINE/readCzi
+BugReports: https://github.com/SFB-ELAINE/readCzi/issues
+License: GPL (>= 3)
+Depends: 
+    R (>= 4.0.0)
+Imports:
+    BiocManager (>= 1.30.19),
+    EBImage (>= 4.40.0),
+    reticulate (>= 1.26),
+    tibble (>= 3.1.8),
+    xml2 (>= 1.3.3)
 Encoding: UTF-8
 LazyData: true
-Imports: BiocManager, reticulate, EBImage, xml2
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

@@ -18,15 +18,6 @@ readCziMetadata_AxioImager <- function(metadata = NULL,
   # Get information of laser microscopes with apotome ######################
   metadata_XML <- xml2::read_xml(x = metadata)
 
-  # # Channel names
-  # look_for <- paste(".//Channel", sep="")
-  # channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-  # channel_ids <- unique(xml2::xml_attr(x = channel_information, attr = "Id"))
-  # channel_ids <- channel_ids[!is.na(channel_ids)]
-  # channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
-  # channel_names <- channel_names[!is.na(channel_names)]
-
-
   # Empty tibble with channel info
   df_channel_info <- tibble::tibble(track_id = rep(NA, number_of_channels),
                                     channel_id = rep(NA, number_of_channels),
@@ -113,14 +104,6 @@ readCziMetadata_AxioImager <- function(metadata = NULL,
 
   channel_names <- df_channel_info$channel_name
   track_ids <- df_channel_info$track_id
-
-
-  # if(number_of_channels != length(channel_ids)){
-  #   print("The number of channels does not correspond to the number of channel ids in the metadata.")
-  # }
-  # if(number_of_channels != length(channel_names)){
-  #   print("The number of channels does not correspond to the number of channel names in the metadata.")
-  # }
 
   # Empty vectors
   contrast_method <- rep(x = NA, number_of_channels)
