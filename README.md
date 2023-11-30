@@ -11,6 +11,7 @@ The R package **readCzi** has been checked with image data from
 
 ## Example
 The following example (script and results) shows the capabilities of the package.
+The script is found in `inst/testscript.R`.
 
 ```R
 # Testscript for using the R package readCzi +++++++++++++++++++++++++++++++

@@ -5,6 +5,6 @@ bibentry(bibtype = "Manual",
   author = person("Kai", "Budde-Sagert"),
   year = 2023,
   note = "R package version 0.3.0",
-  doi = "NN",
+  doi = "10.5281/zenodo.10231885",
   url = "https://github.com/SFB-ELAINE/readCzi"
 )
