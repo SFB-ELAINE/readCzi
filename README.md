@@ -110,17 +110,11 @@ The results are the following:
     ![Original converted LSM image (z-stack layer 1)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z1_small.jpg?raw=true)
     * Layer 2:
     ![Original converted LSM image (z-stack layer 2)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z2_small.jpg?raw=true)
-    * Layer 3:
-    ![Original converted LSM image (z-stack layer 3)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z3_small.jpg?raw=true)
-    * Layer 4:
-    ![Original converted LSM image (z-stack layer 4)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z4_small.jpg?raw=true)
-    * Layer 5:
-    ![Original converted LSM image (z-stack layer 5)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z5_small.jpg?raw=true)
-    * Layer 6:
-    ![Original converted LSM image (z-stack layer 6)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z6_small.jpg?raw=true)
-    * Layer 7:
-    ![Original converted LSM image (z-stack layer 7)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z7_small.jpg?raw=true)
     * ...
+    * Layer 15:
+    ![Original converted LSM image (z-stack layer 15)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z15_small.jpg?raw=true)
+    * Layer 16:
+    ![Original converted LSM image (z-stack layer 16)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z16_small.jpg?raw=true)
     * Layer 17:
     ![Original converted LSM image (z-stack layer 17)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z17_small.jpg?raw=true)
     * Layer 18:

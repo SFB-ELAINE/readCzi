@@ -35,13 +35,6 @@ stackLayers <- function(image_data = NULL,
       Image_Stack[,,i] <- apply(image_data[,,i,], c(1,2), mean)
     }
 
-    #Alternatives?
-    # Get all color frames
-    #getFrames(y = Input_Image, type = "render")
-    #nuc_th = combine( mapply(function(frame, th) frame > th, getFrames(nuc), threshold, SIMPLIFY=FALSE) )
-
-    #https://dahtah.github.io/imager/imager.html
-
   }else if(stack_method == "maxprojection" || stack_method == "max"){
 
     for(i in 1:dim(image_data)[3]){
@@ -53,13 +46,10 @@ stackLayers <- function(image_data = NULL,
   }else if(stack_method == "maxcontrast"){
 
   }
-  # Check out https://bioconductor.riken.jp/packages/3.7/bioc/vignettes/MaxContrastProjection/inst/doc/MaxContrastProjection.pdf
-  # It is not working right now
 
   if(as_array){
     Image_Stack <- as.array(Image_Stack)
   }
 
   return(Image_Stack)
-
 }

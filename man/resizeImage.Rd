@@ -12,6 +12,9 @@ resizeImage(image = NULL, resize_factor = 1)
 
 \item{resize_factor}{A number (factor for resizing an image)}
 }
+\value{
+A reduced array (image).
+}
 \description{
 Resizes an image
 }

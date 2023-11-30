@@ -213,12 +213,6 @@ convertCziToTif <- function(input_file = NULL,
 
     if(dim_z > 1){
 
-      # for(i in 1:3){
-      #   if(max(Image_Stack[,,i]) > 0){
-      #     Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
-      #   }
-      # }
-
       disregarded_layers <- c()
       for(i in 1:3){
         if(max(Image_Stack[,,i]) == 0){
@@ -231,12 +225,6 @@ convertCziToTif <- function(input_file = NULL,
 
       output_file_name <- paste(output_dir, "/", image_name_wo_czi, "_zstack_histogram_equalized_normalized.tif", sep="")
     }else{
-
-      # for(i in 1:3){
-      #   if(max(Image_Data[,,i]) > 0){
-      #     Image_Stack_normalized[,,i] <- Image_Stack_normalized[,,i]/max(Image_Stack_normalized[,,i])
-      #   }
-      # }
 
       disregarded_layers <- c()
       for(i in 1:3){

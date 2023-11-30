@@ -18,28 +18,6 @@ readCziMetadata_Apotome <- function(metadata = NULL,
   # Get information of laser microscopes with Apotome ######################
   metadata_XML <- xml2::read_xml(x = metadata)
 
-  # # Channel names
-  # look_for <- paste(".//Channel", sep="")
-  # channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-  #
-  # xml2::xml_attr(x = channel_information, attr = "Name")
-  #
-  # channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
-  #
-  # # Check different source for channel names if the number of names
-  # # does not match the number of channels
-  # if(number_of_channels != length(channel_names)){
-  #
-  #   look_for <- paste(".//DisplaySetting/Channels/Channel", sep="")
-  #   channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-  #   channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
-  #
-  #   if(number_of_channels != length(channel_names)){
-  #     print("The number of channels does not correspond to the number of channel names in the metadata.")
-  #     return()
-  #   }
-  # }
-
   # Empty tibble with channel info
   df_channel_info <- tibble::tibble(track_id = rep(NA, number_of_channels),
                                     channel_id = rep(NA, number_of_channels),
@@ -200,30 +178,7 @@ readCziMetadata_Apotome <- function(metadata = NULL,
   }
 
 
-  #
-  # order_of_channels <- 1:number_of_channels
-  # if(!all.equal(order_of_channels, channel_order)){
-  #
-  #   acquisition_mode_copy <- acquisition_mode
-  #   illumination_type_copy <- illumination_type
-  #   illumination_wavelengths_copy <- illumination_wavelengths_in_nm
-  #   excitation_wavelengths_copy <- excitation_wavelengths_in_nm
-  #   emission_wavelengths_copy <- emission_wavelengths_in_nm
-  #   light_source_intensities_copy <- light_source_intensities
-  #   fluorophores_copy <- fluorophores
-  #
-  #   for(i in 1:number_of_channels){
-  #     acquisition_mode[i] <- acquisition_mode_copy[channel_order[i]]
-  #     illumination_type[i] <- illumination_type_copy[channel_order[i]]
-  #     illumination_wavelengths_in_nm[i] <- illumination_wavelengths_copy[channel_order[i]]
-  #     excitation_wavelengths_in_nm[i] <- excitation_wavelengths_copy[channel_order[i]]
-  #     emission_wavelengths_in_nm[i] <- emission_wavelengths_copy[channel_order[i]]
-  #     light_source_intensities[i] <- light_source_intensities_copy[channel_order[i]]
-  #     fluorophores[i] <- fluorophores_copy[channel_order[i]]
-  #   }
-  # }
-
-  # Finding the color of each channel and the corresponding chan number ----
+  # Finding the color of each channel and the corresponding channel number ----
 
   # Sorting the channels information regarding wavelength
   channel_order <- order(illumination_wavelengths_in_nm)

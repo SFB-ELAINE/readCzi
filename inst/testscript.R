@@ -91,7 +91,7 @@ readr::write_csv(x = df_metadata, file = file_path_en)
 readr::write_csv2(x = df_metadata, file = file_path_de)
 
 ## 3. Convert czi file to tifs ---------------------------------------------
-# convertCziToTif(input_file = input_file)
+# convertCziToTif(input_file = input_file) # Use this for examples for testing
 convertCziToTif(input_file = input_file,
                 convert_all_slices = TRUE)
 
