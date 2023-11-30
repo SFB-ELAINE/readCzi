@@ -3,10 +3,11 @@
 #' @details Normalize the intensity of an image by dividing all values by
 #' the maximum intensity.
 #' @aliases normalizeintensity
-#' @author Kai Budde
+#' @author Kai Budde-Sagert
 #' @export normalizeIntensity
 #' @param image An three-dimensional array of numbers between 0 and 1
 #' @param disregarded_layers A vector of layers that shall not be normalized
+#' @returns An array (image with normalized intensity values).
 
 normalizeIntensity <- function(image = NULL,
                                disregarded_layers = NULL){

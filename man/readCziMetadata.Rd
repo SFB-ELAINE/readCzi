@@ -12,10 +12,10 @@ readCziMetadata(input_file = NULL, save_metadata = TRUE)
 \arguments{
 \item{input_file}{A character (path to czi file to be read)}
 
-\item{save_metadata}{A boolean (save metadata as txt file if TRUE)}
+\item{save_metadata}{A Boolean (save metadata as txt file if TRUE)}
 }
 \value{
-A data frame with key information from the metadata is returned.
+A tibble with key information from the metadata.
 }
 \description{
 Reads and saves key values from czi metadata as well as
@@ -26,5 +26,5 @@ This functions saves the metadata of a czi file as txt and also
 extract the most important information and saves it in a data frame.
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

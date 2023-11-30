@@ -14,8 +14,11 @@ stackLayers(image_data = NULL, stack_method = "average", as_array = FALSE)
 \item{stack_method}{A character (method for stacking the images: average,
 maxprojection)}
 
-\item{as_array}{A boolean (if TRUE, the data is return as an array and not
+\item{as_array}{A Boolean (if TRUE, the data is return as an array and not
 an EBImage class)}
+}
+\value{
+An array (z-stack projection of a 3D image).
 }
 \description{
 Stacks z-layers
@@ -25,5 +28,5 @@ This functions saves a multidimensional array (image) as tifs
 and stacks/edits the images if required.
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

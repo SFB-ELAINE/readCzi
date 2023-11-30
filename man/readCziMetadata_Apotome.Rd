@@ -5,8 +5,9 @@
 \title{Check for apotome-specific values in metadata}
 \usage{
 readCziMetadata_Apotome(
-  metadata = metadata,
-  number_of_channels = number_of_channels
+  metadata = NULL,
+  number_of_channels = NULL,
+  number_of_tracks = NULL
 )
 }
 \arguments{

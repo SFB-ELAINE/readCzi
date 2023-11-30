@@ -19,5 +19,5 @@ Resizes an image
 Resizes an image with a given scaling factor
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

@@ -16,13 +16,16 @@ addScaleBar(
 }
 \arguments{
 \item{image}{An array (2 or 3 dimensional array, could also be of
-formal class Image by package EBImage)}
+formal class image by package EBimage)}
 
 \item{length_per_pixel_in_um}{A number (length per pixel in um)}
 
 \item{distance_from_border}{A number (distance in pixels for the scale bar)}
 
 \item{number_size_factor}{A number (factor for resizing the number)}
+}
+\value{
+An array (image with added scale bar).
 }
 \description{
 Add a horizontal scale bare to image
@@ -32,5 +35,5 @@ Add a scale bar to a tiff image depending on the meta data of
 the czi file
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

@@ -4,7 +4,7 @@
 #' and stacks/edits the images if required.
 #' @aliases convertczitotif convertCzitotif convertcziTotif convertczitoTif
 #' convertCziTotif convertcziToTif
-#' @author Kai Budde
+#' @author Kai Budde-Sagert
 #' @export convertCziToTif
 #' @param input_file A character (path to czi file to be converted)
 #' @param output_dir A character (name of output directory)
@@ -21,8 +21,7 @@
 #' @param change_layers A character (either "none" or, e.g., "green<->red")
 #' @param add_scale_bar A logic (add scale bar to all images that are saved
 #' if true)
-
-# TODO: stack_method: average OR max (instead of maxprojection)
+#' @returns Nothing but saves the converted czi file as tif file(s).
 
 convertCziToTif <- function(input_file = NULL,
                             output_dir = "output",
@@ -37,6 +36,11 @@ convertCziToTif <- function(input_file = NULL,
   if(is.null(input_file)){
     print("Please call function with input file.")
     return()
+  }
+
+  if(!("EBImage" %in% utils::installed.packages())){
+    print("Installing EBImage.")
+    BiocManager::install("EBImage")
   }
 
   # Create output directory ------------------------------------------------
@@ -114,14 +118,14 @@ convertCziToTif <- function(input_file = NULL,
     tif_file_names <- rep(image_name_wo_czi, dim(image_data)[4])
     tif_file_names <- paste(output_dir, "/", tif_file_names, "_z", 1:dim(image_data)[4], ".tif", sep="")
 
-    Image_Data <- Image_Data_copy
+    Image_Data_copy <- Image_Data
     if(add_scale_bar){
       Image_Data <- addScaleBar(image = Image_Data,
-                                length_per_pixel = length_per_pixel_x_in_um)
+                                length_per_pixel_in_um = length_per_pixel_x_in_um)
     }
 
     EBImage::writeImage(x = Image_Data, files = tif_file_names, type = "tiff", bits.per.sample = 8)
-    Image_Data_copy <- Image_Data
+    Image_Data <- Image_Data_copy
     rm(Image_Data_copy)
   }
 
@@ -136,7 +140,7 @@ convertCziToTif <- function(input_file = NULL,
     Image_Stack_copy <- Image_Stack
     if(add_scale_bar){
       Image_Stack <- addScaleBar(image = Image_Stack,
-                                length_per_pixel = length_per_pixel_x_in_um)
+                                length_per_pixel_in_um = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Stack, files = stack_file_name, type = "tiff", bits.per.sample = 8)
     Image_Stack <- Image_Stack_copy
@@ -144,12 +148,12 @@ convertCziToTif <- function(input_file = NULL,
   }else{
     # Not a z-stack image (dim_z==1)
 
-    output_file_name <- paste(output_dir, "/", image_name_wo_czi, ".tif", sep="")
+    output_file_name <- file.path(output_dir, paste0(image_name_wo_czi, ".tif"))
 
     Image_Data_copy <- Image_Data
     if(add_scale_bar){
       Image_Data <- addScaleBar(image = Image_Data,
-                                 length_per_pixel = length_per_pixel_x_in_um)
+                                length_per_pixel_in_um = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Data, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
@@ -158,7 +162,7 @@ convertCziToTif <- function(input_file = NULL,
   }
 
 
-  # Enhance contrast of z-sclices ------------------------------------------
+  # Enhance contrast of z-slices ------------------------------------------
   if(dim_z > 1 && higher_contrast_slices){
 
     Image_Data_histogram_equalization <- EBImage::combine(lapply(X = EBImage::getFrames(y = Image_Data, type = "render"),
@@ -170,7 +174,7 @@ convertCziToTif <- function(input_file = NULL,
     Image_Data_copy <- Image_Data
     if(add_scale_bar){
       Image_Data <- addScaleBar(image = Image_Data,
-                                length_per_pixel = length_per_pixel_x_in_um)
+                                length_per_pixel_in_um = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Data, files = tif_file_names, type = "tiff", bits.per.sample = 8)
 
@@ -194,7 +198,7 @@ convertCziToTif <- function(input_file = NULL,
     Image_Stack_histogram_equalization_copy <- Image_Stack_histogram_equalization
     if(add_scale_bar){
       Image_Stack_histogram_equalization <- addScaleBar(image = Image_Stack_histogram_equalization,
-                                length_per_pixel = length_per_pixel_x_in_um)
+                                length_per_pixel_in_um = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Stack_histogram_equalization, files = output_file_name, type = "tiff", bits.per.sample = 8)
 
@@ -250,7 +254,7 @@ convertCziToTif <- function(input_file = NULL,
     Image_Stack_normalized_copy <- Image_Stack_normalized
     if(add_scale_bar){
       Image_Stack_normalized <- addScaleBar(image = Image_Stack_normalized,
-                                            length_per_pixel = length_per_pixel_x_in_um)
+                                            length_per_pixel_in_um = length_per_pixel_x_in_um)
     }
     EBImage::writeImage(x = Image_Stack_normalized, files = output_file_name, type = "tiff", bits.per.sample = 8)
 

@@ -2,19 +2,22 @@
 % Please edit documentation in R/readCziMetadata_LSM.R
 \name{readCziMetadata_LSM}
 \alias{readCziMetadata_LSM}
-\title{Check for apotome-specific values in metadata}
+\title{Check for LSM-specific values in metadata}
 \usage{
 readCziMetadata_LSM(
-  metadata = metadata,
-  number_of_channels = number_of_channels
+  metadata = NULL,
+  number_of_channels = NULL,
+  number_of_tracks = NULL
 )
 }
 \arguments{
 \item{metadata}{A character (loaded metadata in a string)}
 
 \item{number_of_channels}{A number}
+
+\item{number_of_tracks}{A number}
 }
 \description{
-Check for apotome-specific values in metadata
+Check for LSM-specific values in metadata
 }
 \keyword{internal}

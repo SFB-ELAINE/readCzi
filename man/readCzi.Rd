@@ -20,9 +20,9 @@ Imports czi files
 }
 \details{
 The function returns a multidimensional array with pixel
-identities from 0 to 1. The order of the array's dimensions are:
-row (y), column (x), channel (red, green, blue), slices (z)
+intensities from 0 to 1. The array's dimensions are:
+1) row (y), 2) column (x), 3) channel (red, green, blue), 4) z sections (z)
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

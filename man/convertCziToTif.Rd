@@ -49,6 +49,9 @@ of the z-stack or original image if it is not a z stack)}
 \item{add_scale_bar}{A logic (add scale bar to all images that are saved
 if true)}
 }
+\value{
+Nothing but saves the converted czi file as tif file(s).
+}
 \description{
 Imports czi file and save them as tif
 }
@@ -57,5 +60,5 @@ This functions saves a multidimensional array (image) as tifs
 and stacks/edits the images if required.
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

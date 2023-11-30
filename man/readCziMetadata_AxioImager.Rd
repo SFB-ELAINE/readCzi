@@ -2,11 +2,12 @@
 % Please edit documentation in R/readCziMetadata_AxioImager.R
 \name{readCziMetadata_AxioImager}
 \alias{readCziMetadata_AxioImager}
-\title{Check for specific values in metadata for all other microscope types}
+\title{Check for specific Axio-imager values in metadata}
 \usage{
 readCziMetadata_AxioImager(
-  metadata = metadata,
-  number_of_channels = number_of_channels
+  metadata = NULL,
+  number_of_channels = NULL,
+  number_of_tracks = NULL
 )
 }
 \arguments{
@@ -15,6 +16,6 @@ readCziMetadata_AxioImager(
 \item{number_of_channels}{A number}
 }
 \description{
-Check for specific values in metadata for all other microscope types
+Check for specific Axio-imager values in metadata
 }
 \keyword{internal}

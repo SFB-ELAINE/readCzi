@@ -1,3 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-/examples
+^LICENSE\.md$
+^CITATION\.cff$
+^examplesForTesting

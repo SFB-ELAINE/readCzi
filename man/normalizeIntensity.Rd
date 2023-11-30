@@ -12,6 +12,9 @@ normalizeIntensity(image = NULL, disregarded_layers = NULL)
 
 \item{disregarded_layers}{A vector of layers that shall not be normalized}
 }
+\value{
+An array (image with normalized intensity values).
+}
 \description{
 Normalize the intensity of the image
 }
@@ -20,5 +23,5 @@ Normalize the intensity of an image by dividing all values by
 the maximum intensity.
 }
 \author{
-Kai Budde
+Kai Budde-Sagert
 }

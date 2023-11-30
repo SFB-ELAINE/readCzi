@@ -1,13 +1,13 @@
 #' @title readCzi
 #' @description Imports czi files
 #' @details The function returns a multidimensional array with pixel
-#' identities from 0 to 1. The order of the array's dimensions are:
-#' row (y), column (x), channel (red, green, blue), slices (z)
+#' intensities from 0 to 1. The array's dimensions are:
+#' 1) row (y), 2) column (x), 3) channel (red, green, blue), 4) z sections (z)
 #' @aliases readczi readCZI
-#' @author Kai Budde
+#' @author Kai Budde-Sagert
 #' @export readCzi
 #' @param input_file A character (path to czi file to be converted)
-#' @return A multidimensional array with the following dimensions:
+#' @returns A multidimensional array with the following dimensions:
 #' \code{(x, y, c, z)} with the channels \code{c}.
 
 readCzi <- function(input_file = NULL) {
@@ -139,6 +139,8 @@ readCzi <- function(input_file = NULL) {
            x = metadata,
            ignore.case = TRUE)){
 
+    color_axis <- "C"
+
     # if(number_of_channels == 3){
     #   wavelengths <- gsub(
     #     pattern =  paste(".+<EmissionWavelength>(.+)</EmissionWavelength>.+",
@@ -190,7 +192,77 @@ readCzi <- function(input_file = NULL) {
                     df_metadata$green_channel,
                     df_metadata$blue_channel)
 
-    color_axis <- "C"
+    # Check if all channels have a designated color, if not, provide a color
+    if(df_metadata$number_of_channels > sum(!is.na(rgb_layers))){
+      print("There are more channels than corresponding wavelengths.")
+      if(df_metadata$number_of_tracks < df_metadata$number_of_channels){
+        print("This is because multiple channels were recorded in the same track.")
+
+        duplicated_tracks <- c(df_metadata$track_id_channel_1,
+                               df_metadata$track_id_channel_2,
+                               df_metadata$track_id_channel_3)[
+                                 duplicated(c(df_metadata$track_id_channel_1,
+                                              df_metadata$track_id_channel_2,
+                                              df_metadata$track_id_channel_3))]
+
+        channels_number_with_one_track <- which(
+          c(df_metadata$track_id_channel_1,
+            df_metadata$track_id_channel_2,
+            df_metadata$track_id_channel_3) == duplicated_tracks)
+
+        channels_with_one_track <- c(df_metadata$channel_name_1,
+                                     df_metadata$channel_name_2,
+                                     df_metadata$channel_name_3)[
+                                       channels_number_with_one_track]
+
+
+        print(paste0("This is true for channels: ",
+                     paste0(channels_number_with_one_track, collapse = " and "),
+                     " having the names ",
+                     paste0(channels_with_one_track, collapse = " and "), "."))
+
+        # Provide a color for channels without one
+        available_channels <- which(c(!is.na(df_metadata$channel_name_1),
+                                      !is.na(df_metadata$channel_name_2),
+                                      !is.na(df_metadata$channel_name_3)))
+
+        available_channel_names <- c(df_metadata$channel_name_1,
+                                     df_metadata$channel_name_2,
+                                     df_metadata$channel_name_3)[
+                                       available_channels]
+
+        channels_without_color <- available_channels[!available_channels %in% rgb_layers]
+
+        for(i in 1:length(channels_without_color)){
+
+          if(which(is.na(rgb_layers))[i] == 1){
+            new_color <- "red"
+          }else if(which(is.na(rgb_layers))[i] == 2){
+            new_color <- "green"
+          }else if(which(is.na(rgb_layers))[i] == 3){
+            new_color <- "blue"
+          }
+
+          # Designated color for channel
+          rgb_layers[which(is.na(rgb_layers))[i]] <- channels_without_color[i]
+
+          current_channel_name <- c(df_metadata$channel_name_1,
+                                    df_metadata$channel_name_2,
+                                    df_metadata$channel_name_3)[
+                                      channels_without_color[i]]
+
+          print(paste0("Channel ", channels_without_color[i], " (name: ",
+                       current_channel_name, ") now ", new_color,
+                       "."))
+
+        }
+        rm(i)
+
+
+        df_metadata$track_id_channel_1
+      }
+
+    }
 
   }
 
@@ -228,11 +300,14 @@ readCzi <- function(input_file = NULL) {
     copy_image_loaded <- image_loaded
     image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 3, dim_z))
 
-    if(number_of_channels != 3){
-      image_loaded[,,-which(rgb_layers == 0),] <- copy_image_loaded
-    }
+    # if(number_of_channels != 3){
+    #   image_loaded[,,-which(rgb_layers == 0),] <- copy_image_loaded
+    # }
 
+    # Copy image layers in the correct order depending on which dimension
+    # the original image has
     if(length(dim(copy_image_loaded)) == 12){
+
       if(!is.na(rgb_layers[1]) && rgb_layers[1] != 0){
         image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,,,,,]
       }
@@ -257,6 +332,7 @@ readCzi <- function(input_file = NULL) {
       }
 
     }else if(length(dim(copy_image_loaded)) == 8){
+
       if(!is.na(rgb_layers[1]) && rgb_layers[1] != 0){
         image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,,]
       }
@@ -360,6 +436,9 @@ readCzi <- function(input_file = NULL) {
   }else{
     print(paste("There is no color axis.", sep=""))
   }
+
+  # Check if we have a (Transmitted light detector (T-PMT)) which needs to
+  # be saved in a different color (to not overwrite the other ones)
 
   # Reverse y-axis (It will go from top to bottom instead from bottom to top)
   #image_loaded <- EBImage::flip(image_loaded)

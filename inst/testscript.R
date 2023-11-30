@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi +++++++++++++++++++++++++++++++
-# Author: Kai Budde
+# Author: Kai Budde-Sagert
 # Created: 2021/04/08
-# Last changed: 2021/04/08
+# Last changed: 2023/11/29
 
 
 # Delete everything in the environment
@@ -10,72 +10,107 @@ rm(list = ls())
 graphics.off()
 
 # Load packages ############################################################
+groundhog.day <- "2023-01-01"
+if(!any(grepl(pattern = "groundhog", x = installed.packages(), ignore.case = TRUE))){
+  install.packages("groundhog")
+}
 
-list.of.packages <- c("BiocManager", "reticulate")
-#list.of.packages <- c("tiff", "dplyr", "devtools", "BiocManager", "xlsx", "zis", "reticulate")
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
+# Load packages
+library(groundhog)
+pkgs <- c("BiocManager", "devtools", "magick", "reticulate",
+          "tibble", "xml2")
+groundhog.library(pkgs, groundhog.day)
 
 if(!("EBImage" %in% utils::installed.packages())){
   print("Installing EBImage.")
   BiocManager::install("EBImage")
-  #BiocManager::install("MaxContrastProjection")
 }
 
-# Install the R package for reading czi images
-if(!("readCzi" %in% installed.packages()[,"Package"])){
-  print("Installing readCzi.")
-  devtools::install_github("SFB-ELAINE/readCzi", ref = "v0.1.2")
-}
-
-require(devtools)
 require(EBImage)
-require(reticulate)
+
+# Install Python package for reading CZI files
+# (Users will be asked to install miniconda when starting for the first time)
+if(! "czifile" %in% reticulate::py_list_packages()$package){
+  reticulate::py_install("czifile")
+}
+
+# Install this R package for reading CZI images
+if(!("readCzi" %in% installed.packages()[,"Package"])){
+  devtools::install_github("SFB-ELAINE/readCzi")
+}
 require(readCzi)
-
-# Read in Python package for reading czi files
-# (Users will be asked to install miniconda
-# when starting for the first time)
-reticulate::py_install("czifile")
-
-
+# devtools::load_all()
+# devtools::document()
+# devtools::check()
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-input_file <- "tests/image1.czi"
-#input_folder <- "tests/"
+
+# Input file
+input_file <- system.file("extdata", "LSM_threeChannels.czi",
+                          package = "readCzi", mustWork = TRUE)
+
+# # Examples for testing
+# input_file <- system.file("examplesForTesting", "Apotome_Test.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "AxioImager_Test.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "AxioImager_Test2.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "LSM_oneChannel.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "LSM_twoChannels.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "LSM_threeChannels.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "LSM_twoTracksThreeChannels.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "LSM_withTransmission.czi",
+#                           package = "readCzi", mustWork = TRUE)
+# input_file <- system.file("examplesForTesting", "LSM_zstack_threeChannels.czi",
+#                           package = "readCzi", mustWork = TRUE)
+
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+## 1. Read czi file and store as array -------------------------------------
+image_data <- readCzi(input_file = input_file)
+
+## 2. Read metadata of czi file and save as CSV ----------------------------
+##    (in German and English format)
+df_metadata <- readCziMetadata(input_file = input_file,
+                               save_metadata = TRUE)
+
+file_path_de <- file.path(dirname(input_file), "output",
+                          paste0(gsub("\\.czi", "", basename(input_file)), "_df_metadata_de.csv"))
+file_path_en <- file.path(dirname(input_file), "output",
+                          paste0(gsub("\\.czi", "", basename(input_file)), "_df_metadata_en.csv"))
+
+dir.create(path = file.path(dirname(input_file), "output"), showWarnings = FALSE)
+readr::write_csv(x = df_metadata, file = file_path_en)
+readr::write_csv2(x = df_metadata, file = file_path_de)
+
+## 3. Convert czi file to tifs ---------------------------------------------
+# convertCziToTif(input_file = input_file)
+convertCziToTif(input_file = input_file,
+                convert_all_slices = TRUE)
 
 
-### Test with files --------------------------------------------------------
+## 4. Copy results to doc directory for README -----------------------------
+image_files <- list.files(path = system.file("extdata", "output",
+                                             package = "readCzi",
+                                             mustWork = TRUE),
+                          pattern = "tif", full.names = TRUE)
 
-# Test script for reading czi-file -----------------------------------------
-image_data <- readCzi(input_file <- input_file)
+for(i in seq_along(image_files)){
+  image_file <- magick::image_read(image_files[i])
+  resized_image <- magick::image_scale(image = image_file, geometry = "800x800")
+  image_path <- gsub(pattern = "\\.tif", replacement = "_small.jpg", x = basename(image_files[i]))
+  image_path <-  file.path(
+    system.file("docs", package = "readCzi", mustWork = TRUE),
+    image_path)
+  magick::image_write(image = resized_image,
+                      path = image_path, format = "jpg")
+}
 
-# Test script for reading metadata of czi-file -----------------------------
-df_metadata <- readCziMetadata(input_file <- input_file)
-
-# Test script for converting a czi file into a tif file --------------------
-convertCziToTif(input_file <- input_file)
-
-### Test with files in folder ----------------------------------------------
-
-# czi_files <- list.files(path = input_folder, pattern = "\\.czi", full.names = TRUE)
-#
-# for(i in 1:length(czi_files)){
-#   convertCziToTif(input_file = czi_files[i])
-#
-#   if(i == 1){
-#     df_metadata <- readCziMetadata(input_file <- czi_files[i])
-#   }else{
-#     df_dummy <- readCziMetadata(input_file <- czi_files[i])
-#     df_metadata <- rbind(df_metadata, df_dummy)
-#   }
-# }
-#
-#save(df_metadata, file = paste(input_folder, "output/df_metadata.Rda", sep=""))
-#write.csv2(x = df_metadata, file = paste(input_folder, "output/df_metadata_de.csv", sep=""))
-
-
+rm(list = c("image_files", "image_file", "resized_image", "image_path", "i"))

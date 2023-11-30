@@ -1,0 +1,111 @@
+# -----------------------------------------------------------
+# CITATION file created with {cffr} R package, v0.5.0
+# See also: https://docs.ropensci.org/cffr/
+# -----------------------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "readCzi" in publications use:'
+type: software
+license: GPL-3.0-or-later
+title: 'readCzi: Read czi image files, convert them to tifs, and save metadata'
+version: 0.2.4
+abstract: The package reads (z-stack) czi microscopy files, edits them, and stores
+  the results in the tif format. The metadata is also read and saved and transformed
+  into a tibble.
+authors:
+- family-names: Budde
+  given-names: Kai
+  email: kai.budde-sagert@uni-rostock.de
+- name: c
+- family-names: c)
+  given-names: comment =
+repository-code: https://github.com/SFB-ELAINE/readCzi
+url: https://github.com/SFB-ELAINE/readCzi
+contact:
+- family-names: Budde
+  given-names: Kai
+  email: kai.budde-sagert@uni-rostock.de
+references:
+- type: software
+  title: 'R: A Language and Environment for Statistical Computing'
+  notes: Depends
+  url: https://www.R-project.org/
+  authors:
+  - name: R Core Team
+  location:
+    name: Vienna, Austria
+  year: '2023'
+  institution:
+    name: R Foundation for Statistical Computing
+  version: '>= 4.0.0'
+- type: software
+  title: BiocManager
+  abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
+  notes: Imports
+  url: https://github.com/Bioconductor/BiocManager
+  repository: https://CRAN.R-project.org/package=BiocManager
+  authors:
+  - family-names: Morgan
+    given-names: Martin
+    email: martin.morgan@roswellpark.org
+    orcid: https://orcid.org/0000-0002-5874-8148
+  year: '2023'
+  version: '>='
+- type: software
+  title: reticulate
+  abstract: 'reticulate: Interface to ''Python'''
+  notes: Imports
+  url: https://rstudio.github.io/reticulate/
+  repository: https://CRAN.R-project.org/package=reticulate
+  authors:
+  - family-names: Ushey
+    given-names: Kevin
+    email: kevin@rstudio.com
+  - family-names: Allaire
+    given-names: JJ
+    email: jj@rstudio.com
+  - family-names: Tang
+    given-names: Yuan
+    email: terrytangyuan@gmail.com
+    orcid: https://orcid.org/0000-0001-5243-233X
+  year: '2023'
+  version: '>='
+- type: software
+  title: EBImage
+  abstract: 'EBImage: Image processing and analysis toolbox for R'
+  notes: Imports
+  url: https://github.com/aoles/EBImage
+  repository: https://bioconductor.org/
+  authors:
+  - family-names: Oles
+    given-names: Andrzej
+  - family-names: Pau
+    given-names: Gregoire
+  - family-names: Smith
+    given-names: Mike
+  - family-names: Sklyar
+    given-names: Oleg
+  - family-names: Huber
+    given-names: Wolfgang
+  - family-names: Barry
+    given-names: with contributions from Joseph
+  - family-names: Marais
+    given-names: Philip A.
+  year: '2023'
+  version: '>='
+- type: software
+  title: xml2
+  abstract: 'xml2: Parse XML'
+  notes: Imports
+  url: https://xml2.r-lib.org/
+  repository: https://CRAN.R-project.org/package=xml2
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@rstudio.com
+  - family-names: Hester
+    given-names: Jim
+  - family-names: Ooms
+    given-names: Jeroen
+  year: '2023'
+  version: '>='

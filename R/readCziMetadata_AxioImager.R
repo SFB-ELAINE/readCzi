@@ -3,28 +3,124 @@
 #' @param number_of_channels A number
 #' @keywords internal
 
-readCziMetadata_AxioImager <- function(metadata = metadata,
-                                       number_of_channels = number_of_channels) {
+readCziMetadata_AxioImager <- function(metadata = NULL,
+                                       number_of_channels = NULL,
+                                       number_of_tracks = NULL) {
 
-
-  metadata_XML <- xml2::read_xml(x = metadata)
+  # Default values for missing arguments ###################################
+  if(is.null(metadata) ||
+     is.null(number_of_channels) ||
+     is.null(number_of_tracks)){
+    print(paste("Please call the function correctly.", sep=""))
+    return()
+  }
 
   # Get information of laser microscopes with apotome ######################
+  metadata_XML <- xml2::read_xml(x = metadata)
 
-  # Channel names
-  look_for <- paste(".//Channel", sep="")
-  channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
-  channel_ids <- unique(xml2::xml_attr(x = channel_information, attr = "Id"))
-  channel_ids <- channel_ids[!is.na(channel_ids)]
-  channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
-  channel_names <- channel_names[!is.na(channel_names)]
+  # # Channel names
+  # look_for <- paste(".//Channel", sep="")
+  # channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+  # channel_ids <- unique(xml2::xml_attr(x = channel_information, attr = "Id"))
+  # channel_ids <- channel_ids[!is.na(channel_ids)]
+  # channel_names <- unique(xml2::xml_attr(x = channel_information, attr = "Name"))
+  # channel_names <- channel_names[!is.na(channel_names)]
 
-  if(number_of_channels != length(channel_ids)){
-    print("The number of channels does not correspond to the number of channel ids in the metadata.")
+
+  # Empty tibble with channel info
+  df_channel_info <- tibble::tibble(track_id = rep(NA, number_of_channels),
+                                    channel_id = rep(NA, number_of_channels),
+                                    channel_name = rep(NA, number_of_channels))
+
+  # Go through each track and write down channels
+  if(number_of_tracks > 0){
+    tracks_information <- xml2::xml_find_all(x = metadata_XML, xpath = ".//Tracks/Track")
+    tracks_ids <- unique(xml2::xml_attr(x = tracks_information, attr = "Id"))
+  }else{
+    tracks_ids <- NA
   }
-  if(number_of_channels != length(channel_names)){
+
+  if(number_of_tracks > 0){
+    for(i in 1:length(tracks_ids)){
+      # Find all channels belonging to a track
+      current_track <- tracks_ids[i]
+      current_track_information <- xml2::xml_find_all(
+        x = metadata_XML,
+        xpath = paste0(".//Tracks/Track[@Id='",current_track,"']"))
+      channel_refs <- xml2::xml_attr(x = xml2::xml_find_all(
+        x = current_track_information, xpath = ".//ChannelRef"),
+        attr = "Id")
+
+      # Fill tibble
+      first_empty_row <- which(is.na(df_channel_info$channel_id))[1]
+
+      df_channel_info$track_id[
+        first_empty_row:(first_empty_row+length(channel_refs)-1)] <- current_track
+
+      df_channel_info$channel_id[
+        first_empty_row:(first_empty_row+length(channel_refs)-1)] <- channel_refs
+    }
+
+    rm(i)
+  }else{
+    # Find Channel information if there is no track
+    channel_ids <- xml2::xml_attr(x = xml2::xml_find_all(
+      x = metadata_XML, xpath = ".//Channel"),
+      attr = "Id")
+
+    channel_ids <- unique(channel_ids)
+
+    if(length(channel_ids) > 1){
+      print("Attention! We have more than one channel but no track.")
+    }
+
+    df_channel_info$track_id[1] <- NA
+
+    df_channel_info$channel_id[1] <- channel_ids
+
+  }
+
+
+  # Go through all channel ids and add channel names
+  #todo: anderen ort für id nehmen, wenn nicht dort vorhanden
+  for(i in 1:length(df_channel_info$channel_id)){
+    current_channel_id <- df_channel_info$channel_id[i]
+    current_channel_information <- xml2::xml_find_all(
+      x = metadata_XML,
+      xpath = paste0(".//Dimensions/Channels/Channel[@Id='",
+                     current_channel_id, "']"))
+    current_channel_name <- xml2::xml_attr(x = current_channel_information,
+                                           attr = "Name")
+
+    # Use alternative node for finding channel name
+    if(is.na(current_channel_name)){
+      current_channel_information <- xml2::xml_find_all(
+        x = metadata_XML,
+        xpath = paste0(".//DisplaySetting/Channels/Channel[@Id='",
+                       current_channel_id, "']"))
+      current_channel_name <- xml2::xml_attr(x = current_channel_information,
+                                             attr = "Name")
+    }
+
+
+    df_channel_info$channel_name[
+      df_channel_info$channel_id == current_channel_id] <- current_channel_name
+  }
+
+  if(number_of_channels != sum(!is.na(df_channel_info$channel_name))){
     print("The number of channels does not correspond to the number of channel names in the metadata.")
   }
+
+  channel_names <- df_channel_info$channel_name
+  track_ids <- df_channel_info$track_id
+
+
+  # if(number_of_channels != length(channel_ids)){
+  #   print("The number of channels does not correspond to the number of channel ids in the metadata.")
+  # }
+  # if(number_of_channels != length(channel_names)){
+  #   print("The number of channels does not correspond to the number of channel names in the metadata.")
+  # }
 
   # Empty vectors
   contrast_method <- rep(x = NA, number_of_channels)
@@ -41,7 +137,7 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
   for(i in 1:number_of_channels){
 
     # Filter for channel Id
-    look_for <- paste(".//Dimensions/Channels/Channel[@Id='", channel_ids[i], "']", sep="")
+    look_for <- paste(".//Dimensions/Channels/Channel[@Id='", df_channel_info$channel_id[i], "']", sep="")
     channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
     channel_information <- xml2::as_list(channel_information)
 
@@ -86,6 +182,7 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     "microscopy_system" = NA,
     "color_system" = NA,
     "number_of_channels" = NA,
+    "number_of_tracks" = NA,
     "objective" = NA,
     "objective_magnification" = NA,
     "dim_x" = NA,
@@ -94,20 +191,23 @@ readCziMetadata_AxioImager <- function(metadata = metadata,
     "scaling_x_in_um" = NA,
     "scaling_y_in_um" = NA,
     "scaling_z_in_um" = NA,
-    "contrast_method_1" = contrast_method[1],
-    "contrast_method_2" = contrast_method[2],
-    "contrast_method_3" = contrast_method[3],
-    "acquisition_mode" = acquisition_mode,
-    "illumination_type" = illumination_type,
-    "exposure_time_1_in_ms" = exposure_times_in_ms[1],
-    "exposure_time_2_in_ms" = exposure_times_in_ms[2],
-    "exposure_time_3_in_ms" = exposure_times_in_ms[3],
     "channel_name_1" = channel_names[1],
     "channel_name_2" = channel_names[2],
     "channel_name_3" = channel_names[3],
-    "fluorophore_1" = fluorophores[1],
-    "fluorophore_2" = fluorophores[2],
-    "fluorophore_3" = fluorophores[3]
+    "track_id_channel_1" = track_ids[1],
+    "track_id_channel_2" = track_ids[2],
+    "track_id_channel_3" = track_ids[3],
+    "contrast_method_channel_1" = contrast_method[1],
+    "contrast_method_channel_2" = contrast_method[2],
+    "contrast_method_channel_3" = contrast_method[3],
+    "acquisition_mode" = acquisition_mode,
+    "illumination_type" = illumination_type,
+    "exposure_time_channel_1_in_ms" = exposure_times_in_ms[1],
+    "exposure_time_channel_2_in_ms" = exposure_times_in_ms[2],
+    "exposure_time_channel_3_in_ms" = exposure_times_in_ms[3],
+    "fluorophore_channel_1" = fluorophores[1],
+    "fluorophore_channel_2" = fluorophores[2],
+    "fluorophore_channel_3" = fluorophores[3]
   )
 
   return(df_metadata)

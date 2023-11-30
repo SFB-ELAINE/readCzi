@@ -2,7 +2,7 @@
 #' @description Resizes an image
 #' @details Resizes an image with a given scaling factor
 #' @aliases resizeimage
-#' @author Kai Budde
+#' @author Kai Budde-Sagert
 #' @export resizeImage
 #' @param image An one to three-dimensional array of numbers between 0 and 1
 #' @param resize_factor A number (factor for resizing an image)

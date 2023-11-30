@@ -77,7 +77,7 @@ readCziMetadata_LSM <- function(metadata = NULL,
   }
 
   channel_names <- df_channel_info$channel_name
-
+  track_ids <- df_channel_info$track_id
 
 
   # # Channel names
@@ -250,43 +250,40 @@ readCziMetadata_LSM <- function(metadata = NULL,
   }
   rm(i)
 
-  # Sorting the channels information regarding wavelength ------------------
-  channel_order <- order(detection_wavelength_start_in_nm)
-
-  fluorophores_copy <- fluorophores
-  detection_wavelength_start_copy <- detection_wavelength_start_in_nm
-  detection_wavelength_end_copy <- detection_wavelength_end_in_nm
-  excitation_wavelengths_copy <- excitation_wavelengths_in_nm
-  emission_wavelengths_copy <- emission_wavelengths_in_nm
-  laser_scan_pixel_times_in_ms_copy <- laser_scan_pixel_times_in_ms
-  laser_scan_line_times_in_ms_copy <- laser_scan_line_times_in_ms
-  laser_scan_frame_times_in_ms_copy <- laser_scan_frame_times_in_ms
-  averaging_copy <- averaging
-  laser_scan_zoom_x_copy <- laser_scan_zoom_x
-  laser_scan_zoom_y_copy <- laser_scan_zoom_y
-  photon_conversion_factors_copy <- photon_conversion_factors
-  detector_gain_copy <- detector_gain
-  digital_gain_copy <- digital_gain
-  amplifier_offset_copy <- amplifier_offset
-
-  for(i in 1:number_of_channels){
-    fluorophores[i] <- fluorophores_copy[channel_order[i]]
-    detection_wavelength_start_in_nm[i] <- detection_wavelength_start_copy[channel_order[i]]
-    detection_wavelength_end_in_nm[i] <- detection_wavelength_end_copy[channel_order[i]]
-    excitation_wavelengths_in_nm[i] <- excitation_wavelengths_copy[channel_order[i]]
-    emission_wavelengths_in_nm[i] <- emission_wavelengths_copy[channel_order[i]]
-    laser_scan_pixel_times_in_ms[i] <- laser_scan_pixel_times_in_ms_copy[channel_order[i]]
-    laser_scan_line_times_in_ms[i] <- laser_scan_line_times_in_ms_copy[channel_order[i]]
-    laser_scan_frame_times_in_ms[i] <- laser_scan_frame_times_in_ms_copy[channel_order[i]]
-    averaging[i] <- averaging_copy[channel_order[i]]
-    laser_scan_zoom_x[i] <- laser_scan_zoom_x_copy[channel_order[i]]
-    laser_scan_zoom_y[i] <- laser_scan_zoom_y_copy[channel_order[i]]
-    photon_conversion_factors[i] <- photon_conversion_factors_copy[channel_order[i]]
-    detector_gain[i] <- detector_gain_copy[channel_order[i]]
-    digital_gain[i] <- digital_gain_copy[channel_order[i]]
-    amplifier_offset[i] <- amplifier_offset_copy[channel_order[i]]
-  }
-  rm(i)
+  # fluorophores_copy <- fluorophores
+  # detection_wavelength_start_copy <- detection_wavelength_start_in_nm
+  # detection_wavelength_end_copy <- detection_wavelength_end_in_nm
+  # excitation_wavelengths_copy <- excitation_wavelengths_in_nm
+  # emission_wavelengths_copy <- emission_wavelengths_in_nm
+  # laser_scan_pixel_times_in_ms_copy <- laser_scan_pixel_times_in_ms
+  # laser_scan_line_times_in_ms_copy <- laser_scan_line_times_in_ms
+  # laser_scan_frame_times_in_ms_copy <- laser_scan_frame_times_in_ms
+  # averaging_copy <- averaging
+  # laser_scan_zoom_x_copy <- laser_scan_zoom_x
+  # laser_scan_zoom_y_copy <- laser_scan_zoom_y
+  # photon_conversion_factors_copy <- photon_conversion_factors
+  # detector_gain_copy <- detector_gain
+  # digital_gain_copy <- digital_gain
+  # amplifier_offset_copy <- amplifier_offset
+  #
+  # for(i in 1:number_of_channels){
+  #   fluorophores[i] <- fluorophores_copy[channel_order[i]]
+  #   detection_wavelength_start_in_nm[i] <- detection_wavelength_start_copy[channel_order[i]]
+  #   detection_wavelength_end_in_nm[i] <- detection_wavelength_end_copy[channel_order[i]]
+  #   excitation_wavelengths_in_nm[i] <- excitation_wavelengths_copy[channel_order[i]]
+  #   emission_wavelengths_in_nm[i] <- emission_wavelengths_copy[channel_order[i]]
+  #   laser_scan_pixel_times_in_ms[i] <- laser_scan_pixel_times_in_ms_copy[channel_order[i]]
+  #   laser_scan_line_times_in_ms[i] <- laser_scan_line_times_in_ms_copy[channel_order[i]]
+  #   laser_scan_frame_times_in_ms[i] <- laser_scan_frame_times_in_ms_copy[channel_order[i]]
+  #   averaging[i] <- averaging_copy[channel_order[i]]
+  #   laser_scan_zoom_x[i] <- laser_scan_zoom_x_copy[channel_order[i]]
+  #   laser_scan_zoom_y[i] <- laser_scan_zoom_y_copy[channel_order[i]]
+  #   photon_conversion_factors[i] <- photon_conversion_factors_copy[channel_order[i]]
+  #   detector_gain[i] <- detector_gain_copy[channel_order[i]]
+  #   digital_gain[i] <- digital_gain_copy[channel_order[i]]
+  #   amplifier_offset[i] <- amplifier_offset_copy[channel_order[i]]
+  # }
+  # rm(i)
 
   # Get experiment tracks information --------------------------------------
 
@@ -307,6 +304,14 @@ readCziMetadata_LSM <- function(metadata = NULL,
   # channel_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
   # channel_information <- xml2::as_list(channel_information)
 
+  laserpowers <- xml2::xml_find_all(x = experiment_information,
+                                    xpath = ".//Lasers/Laser/LaserPower")
+  laserpowers <- xml2::xml_double(x = laserpowers)
+
+  lasernames <- xml2::xml_find_all(x = experiment_information,
+                                   xpath = ".//Lasers/Laser/LaserName")
+  lasernames <- xml2::xml_text(x = lasernames)
+
   for(i in 1:number_of_tracks){
 
     current_track_name <- track_names[i]
@@ -317,19 +322,13 @@ readCziMetadata_LSM <- function(metadata = NULL,
     current_laser <- xml2::xml_find_all(x = current_track_information,
                                         xpath = ".//Laser")
 
-    laser_name[i] <- xml2::xml_text(x = current_laser)
+    laser_name[i] <- paste0(xml2::xml_text(x = current_laser), collapse = ", ")
 
-    laserpowers <- xml2::xml_find_all(x = experiment_information,
-                                      xpath = ".//Lasers/Laser/LaserPower")
-    laserpowers <- xml2::xml_double(x = laserpowers)
-
-    lasernames <- xml2::xml_find_all(x = experiment_information,
-                                     xpath = ".//Lasers/Laser/LaserName")
-    lasernames <- xml2::xml_text(x = lasernames)
-
-    if(laser_name[i] %in% lasernames){
+    if(any(unlist(strsplit(x = laser_name[i], split = ", ")) %in% lasernames)){
       # Laser power in mW
-      laser_power_in_mW[i] <- laserpowers[which(lasernames == laser_name[i])]
+      laser_power_in_mW[i] <- paste0(laserpowers[
+        which(lasernames %in% unlist(
+          strsplit(x = laser_name[i], split = ", ")))], collapse = ", ")
     }
 
     wavelength <- xml2::xml_find_all(x = current_track_information,
@@ -337,7 +336,12 @@ readCziMetadata_LSM <- function(metadata = NULL,
     wavelength <- xml2::xml_double(wavelength)
 
     if(length(wavelength)>0){
-      laser_wavelength_in_nm[i] <- wavelength*1e9
+      if(length(wavelength) > 1){
+        laser_wavelength_in_nm[i] <- paste0(wavelength*1e9, collapse = ", ")
+      }else{
+        laser_wavelength_in_nm[i] <- wavelength*1e9
+      }
+
     }
 
     lasertransmission <- xml2::xml_find_all(x = current_track_information,
@@ -345,34 +349,52 @@ readCziMetadata_LSM <- function(metadata = NULL,
     lasertransmission <- xml2::xml_double(lasertransmission)
 
     if(length(lasertransmission)>0){
-      laser_transmission[i] <- lasertransmission
+      if(length(wavelength) > 1){
+        laser_transmission[i] <- paste0(lasertransmission, collapse = ", ")
+      }else{
+        laser_transmission[i] <- lasertransmission
+      }
+
     }
 
   }
 
   rm(i)
 
-  # Sort experiment information --------------------------------------------
-  experiment_order <- order(laser_wavelength_in_nm)
-
-  laser_name_copy <- laser_name
-  laser_power_in_mW_copy <- laser_power_in_mW
-  laser_wavelength_copy <- laser_wavelength_in_nm
-  laser_transmission_copy <- laser_transmission
-
-  for(i in 1:number_of_channels){
-    laser_name[i] <- laser_name_copy[experiment_order[i]]
-    laser_power_in_mW[i] <- laser_power_in_mW_copy[experiment_order[i]]
-    laser_wavelength_in_nm[i] <- laser_wavelength_copy[experiment_order[i]]
-    laser_transmission[i] <- laser_transmission_copy[experiment_order[i]]
+  if(!any(grepl(pattern = ",", x = laser_power_in_mW))){
+    laser_power_in_mW <- as.numeric(laser_power_in_mW)
+  }
+  if(!any(grepl(pattern = ",", x = laser_wavelength_in_nm))){
+    laser_wavelength_in_nm <- as.numeric(laser_wavelength_in_nm)
+  }
+  if(!any(grepl(pattern = ",", x = laser_transmission))){
+    laser_transmission <- as.numeric(laser_transmission)
   }
 
-  # Finding the color of each channel and the corresponding chan number ----
+  # # Sort experiment information --------------------------------------------
+  # experiment_order <- order(laser_wavelength_in_nm)
+  #
+  # laser_name_copy <- laser_name
+  # laser_power_in_mW_copy <- laser_power_in_mW
+  # laser_wavelength_copy <- laser_wavelength_in_nm
+  # laser_transmission_copy <- laser_transmission
+  #
+  # for(i in 1:number_of_channels){
+  #   laser_name[i] <- laser_name_copy[experiment_order[i]]
+  #   laser_power_in_mW[i] <- laser_power_in_mW_copy[experiment_order[i]]
+  #   laser_wavelength_in_nm[i] <- laser_wavelength_copy[experiment_order[i]]
+  #   laser_transmission[i] <- laser_transmission_copy[experiment_order[i]]
+  # }
+
+  # Finding the color of each channel and the corresponding channel number ----
 
   # Upper and lower limits of emission wavelengths to determine the colors
   red_limit <- 600 #>600nm
   # green: #>= 500nm and <= 600nm
   blue_limit <- 500 #< 500nm
+
+  # Sorting the channels information regarding wavelength
+  channel_order <- order(detection_wavelength_start_in_nm)
 
   if(number_of_channels == 3){
     # 1: blue, 2: green, 3: red
@@ -431,8 +453,8 @@ readCziMetadata_LSM <- function(metadata = NULL,
   emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] <-
     emission_wavelengths_in_nm[emission_wavelengths_in_nm < 1e-6] * 1e9
 
-  laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] <-
-    laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] * 1e9
+  # laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] <-
+  #   laser_wavelength_in_nm[laser_wavelength_in_nm < 1e-6] * 1e9
 
   # Put information into a data frame
   df_metadata <- data.frame(
@@ -440,86 +462,89 @@ readCziMetadata_LSM <- function(metadata = NULL,
     "acquisition_date" = NA,
     "acquisition_time" = NA,
     "microscopy_system" = NA,
-    "detector_identifier_1" = detector_identifier[1],
-    "detector_identifier_2" = detector_identifier[2],
-    "detector_identifier_3" = detector_identifier[3],
     "color_system" = NA,
     "number_of_channels" = NA,
     "number_of_tracks" = NA,
-    "objective_magnification" = NA,
     "objective" = NA,
+    "objective_magnification" = NA,
     "dim_x" = NA,
     "dim_y" = NA,
     "dim_z" = NA,
     "scaling_x_in_um" = NA,
     "scaling_y_in_um" = NA,
     "scaling_z_in_um" = NA,
-    "contrast_method_1" = contrast_method[1],
-    "contrast_method_2" = contrast_method[2],
-    "contrast_method_3" = contrast_method[3],
     "blue_channel" = channel_color[1],
     "green_channel" = channel_color[2],
     "red_channel" = channel_color[3],
     "channel_name_1" = channel_names[1],
     "channel_name_2" = channel_names[2],
     "channel_name_3" = channel_names[3],
-    "fluorophore_1" = fluorophores[1],
-    "fluorophore_2" = fluorophores[2],
-    "fluorophore_3" = fluorophores[3],
-    "detection_wavelength_start_1_in_nm" = detection_wavelength_start_in_nm[1],
-    "detection_wavelength_end_1_in_nm" = detection_wavelength_end_in_nm[1],
-    "detection_wavelength_start_2_in_nm" = detection_wavelength_start_in_nm[2],
-    "detection_wavelength_end_2_in_nm" = detection_wavelength_end_in_nm[2],
-    "detection_wavelength_start_3_in_nm" = detection_wavelength_start_in_nm[3],
-    "detection_wavelength_end_3_in_nm" = detection_wavelength_end_in_nm[3],
-    "excitation_wavelength_1_in_nm"= excitation_wavelengths_in_nm[1],
-    "excitation_wavelength_2_in_nm"= excitation_wavelengths_in_nm[2],
-    "excitation_wavelength_3_in_nm"= excitation_wavelengths_in_nm[3],
-    "emission_wavelength_1_in_nm"= emission_wavelengths_in_nm[1],
-    "emission_wavelength_2_in_nm"= emission_wavelengths_in_nm[2],
-    "emission_wavelength_3_in_nm"= emission_wavelengths_in_nm[3],
-    "laser_scan_pixel_time_1_in_ms" = laser_scan_pixel_times_in_ms[1],
-    "laser_scan_pixel_time_2_in_ms" = laser_scan_pixel_times_in_ms[2],
-    "laser_scan_pixel_time_3_in_ms" = laser_scan_pixel_times_in_ms[3],
-    "laser_scan_line_time_1_in_ms" = laser_scan_line_times_in_ms[1],
-    "laser_scan_line_time_2_in_ms" = laser_scan_line_times_in_ms[2],
-    "laser_scan_line_time_3_in_ms" = laser_scan_line_times_in_ms[3],
-    "laser_scan_frame_time_1_in_ms" = laser_scan_frame_times_in_ms[1],
-    "laser_scan_frame_time_2_in_ms" = laser_scan_frame_times_in_ms[2],
-    "laser_scan_frame_time_3_in_ms" = laser_scan_frame_times_in_ms[3],
-    "laser_scan_averaging_1" = averaging[1],
-    "laser_scan_averaging_2" = averaging[2],
-    "laser_scan_averaging_3" = averaging[3],
-    "laser_scan_zoom_x_1" = laser_scan_zoom_x[1],
-    "laser_scan_zoom_x_2" = laser_scan_zoom_x[2],
-    "laser_scan_zoom_x_3" = laser_scan_zoom_x[3],
-    "laser_scan_zoom_y_1" = laser_scan_zoom_y[1],
-    "laser_scan_zoom_y_2" = laser_scan_zoom_y[2],
-    "laser_scan_zoom_Y_3" = laser_scan_zoom_y[3],
-    "photon_conversion_factor_1" = photon_conversion_factors[1],
-    "photon_conversion_factor_2" = photon_conversion_factors[2],
-    "photon_conversion_factor_3" = photon_conversion_factors[3],
-    "detector_gain_1" = detector_gain[1],
-    "detector_gain_2" = detector_gain[2],
-    "detector_gain_3" = detector_gain[3],
-    "digital_gain_1" = digital_gain[1],
-    "digital_gain_2" = digital_gain[2],
-    "digital_gain_3" = digital_gain[3],
-    "amplifier_offset_1" = amplifier_offset[1],
-    "amplifier_offset_2" = amplifier_offset[2],
-    "amplifier_offset_3" = amplifier_offset[3],
-    "laser_wavelength_1_in_nm" = laser_wavelength_in_nm[1],
-    "laser_wavelength_2_in_nm" = laser_wavelength_in_nm[2],
-    "laser_wavelength_3_in_nm" = laser_wavelength_in_nm[3],
-    "laser_name_1" = laser_name[1],
-    "laser_name_2" = laser_name[2],
-    "laser_name_3" = laser_name[3],
-    "laser_power_in_mW_1" = laser_power_in_mW[1],
-    "laser_power_in_mW_2" = laser_power_in_mW[2],
-    "laser_power_in_mW_3" = laser_power_in_mW[3],
-    "laser_transmission_1" = laser_transmission[1],
-    "laser_transmission_2" = laser_transmission[2],
-    "laser_transmission_3" = laser_transmission[3]
+    "track_id_channel_1" = track_ids[1],
+    "track_id_channel_2" = track_ids[2],
+    "track_id_channel_3" = track_ids[3],
+    "contrast_method_channel_1" = contrast_method[1],
+    "contrast_method_channel_2" = contrast_method[2],
+    "contrast_method_channel_3" = contrast_method[3],
+    "fluorophore_channel_1" = fluorophores[1],
+    "fluorophore_channel_2" = fluorophores[2],
+    "fluorophore_channel_3" = fluorophores[3],
+    "detector_identifier_1" = detector_identifier[1],
+    "detector_identifier_2" = detector_identifier[2],
+    "detector_identifier_3" = detector_identifier[3],
+    "detection_wavelength_start_channel_1_in_nm" = detection_wavelength_start_in_nm[1],
+    "detection_wavelength_end_channel_1_in_nm" = detection_wavelength_end_in_nm[1],
+    "detection_wavelength_start_channel_2_in_nm" = detection_wavelength_start_in_nm[2],
+    "detection_wavelength_end_channel_2_in_nm" = detection_wavelength_end_in_nm[2],
+    "detection_wavelength_start_channel_3_in_nm" = detection_wavelength_start_in_nm[3],
+    "detection_wavelength_end_channel_3_in_nm" = detection_wavelength_end_in_nm[3],
+    "excitation_wavelength_channel_1_in_nm"= excitation_wavelengths_in_nm[1],
+    "excitation_wavelength_channel_2_in_nm"= excitation_wavelengths_in_nm[2],
+    "excitation_wavelength_channel_3_in_nm"= excitation_wavelengths_in_nm[3],
+    "emission_wavelength_channel_1_in_nm"= emission_wavelengths_in_nm[1],
+    "emission_wavelength_channel_2_in_nm"= emission_wavelengths_in_nm[2],
+    "emission_wavelength_channel_3_in_nm"= emission_wavelengths_in_nm[3],
+    "laser_scan_pixel_time_channel_1_in_ms" = laser_scan_pixel_times_in_ms[1],
+    "laser_scan_pixel_time_channel_2_in_ms" = laser_scan_pixel_times_in_ms[2],
+    "laser_scan_pixel_time_channel_3_in_ms" = laser_scan_pixel_times_in_ms[3],
+    "laser_scan_line_time_channel_1_in_ms" = laser_scan_line_times_in_ms[1],
+    "laser_scan_line_time_channel_2_in_ms" = laser_scan_line_times_in_ms[2],
+    "laser_scan_line_time_channel_3_in_ms" = laser_scan_line_times_in_ms[3],
+    "laser_scan_frame_time_channel_1_in_ms" = laser_scan_frame_times_in_ms[1],
+    "laser_scan_frame_time_channel_2_in_ms" = laser_scan_frame_times_in_ms[2],
+    "laser_scan_frame_time_channel_3_in_ms" = laser_scan_frame_times_in_ms[3],
+    "laser_scan_averaging_channel_1" = averaging[1],
+    "laser_scan_averaging_channel_2" = averaging[2],
+    "laser_scan_averaging_channel_3" = averaging[3],
+    "laser_scan_zoom_x_channel_1" = laser_scan_zoom_x[1],
+    "laser_scan_zoom_x_channel_2" = laser_scan_zoom_x[2],
+    "laser_scan_zoom_x_channel_3" = laser_scan_zoom_x[3],
+    "laser_scan_zoom_y_channel_1" = laser_scan_zoom_y[1],
+    "laser_scan_zoom_y_channel_2" = laser_scan_zoom_y[2],
+    "laser_scan_zoom_Y_channel_3" = laser_scan_zoom_y[3],
+    "photon_conversion_factor_channel_1" = photon_conversion_factors[1],
+    "photon_conversion_factor_channel_2" = photon_conversion_factors[2],
+    "photon_conversion_factor_channel_3" = photon_conversion_factors[3],
+    "detector_gain_channel_1" = detector_gain[1],
+    "detector_gain_channel_2" = detector_gain[2],
+    "detector_gain_channel_3" = detector_gain[3],
+    "digital_gain_channel_1" = digital_gain[1],
+    "digital_gain_channel_2" = digital_gain[2],
+    "digital_gain_channel_3" = digital_gain[3],
+    "amplifier_offset_channel_1" = amplifier_offset[1],
+    "amplifier_offset_channel_2" = amplifier_offset[2],
+    "amplifier_offset_channel_3" = amplifier_offset[3],
+    "laser_wavelength_track_1_in_nm" = laser_wavelength_in_nm[1],
+    "laser_wavelength_track_2_in_nm" = laser_wavelength_in_nm[2],
+    "laser_wavelength_track_3_in_nm" = laser_wavelength_in_nm[3],
+    "laser_name_track_1" = laser_name[1],
+    "laser_name_track_2" = laser_name[2],
+    "laser_name_track_3" = laser_name[3],
+    "laser_power_in_mW_track_1" = laser_power_in_mW[1],
+    "laser_power_in_mW_track_2" = laser_power_in_mW[2],
+    "laser_power_in_mW_track_3" = laser_power_in_mW[3],
+    "laser_transmission_track_1" = laser_transmission[1],
+    "laser_transmission_track_2" = laser_transmission[2],
+    "laser_transmission_track_3" = laser_transmission[3]
   )
 
   return(df_metadata)

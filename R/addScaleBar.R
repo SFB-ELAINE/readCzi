@@ -3,13 +3,14 @@
 #' @details Add a scale bar to a tiff image depending on the meta data of
 #' the czi file
 #' @aliases addscaleBar addScalebar addscalebar
-#' @author Kai Budde
+#' @author Kai Budde-Sagert
 #' @export addScaleBar
 #' @param image An array (2 or 3 dimensional array, could also be of
-#' formal class Image by package EBImage)
+#' formal class image by package EBimage)
 #' @param length_per_pixel_in_um A number (length per pixel in um)
 #' @param distance_from_border A number (distance in pixels for the scale bar)
 #' @param number_size_factor A number (factor for resizing the number)
+#' @returns An array (image with added scale bar).
 
 
 addScaleBar <- function(image = NULL,
@@ -17,13 +18,26 @@ addScaleBar <- function(image = NULL,
                         distance_from_border = 20,
                         number_size_factor = 1){
 
+  # if(class(image) == "EBImage"){
+  #   # Convert to array for faster manipulation
+  #   image <- as.array(image)
+  #   image_was_EBImage <- TRUE
+  # }else{
+  #   image_was_EBImage <- FALSE
+  # }
+
+
   # dim_x <- dim(image)[2]
   # dim_y <- dim(image)[1]
-  # dim_z <- dim(image)[3]
+  # dim_c <- dim(image)[3]
   dim_x <- dim(image)[1]
   dim_y <- dim(image)[2]
-  dim_z <- dim(image)[3]
-
+  dim_c <- dim(image)[3]
+  if(length(dim(image)) == 4){
+    dim_z <- dim(image)[4]
+  }else{
+    dim_z <- 1
+  }
 
   dim_x_microns <- dim_x * length_per_pixel_in_um
   length_scale_bar_microns <- round(dim_x_microns / 10)
@@ -51,12 +65,19 @@ addScaleBar <- function(image = NULL,
   # Add the scale_bar
   # image[(dim_y-distance_from_border-heigth_scale_bar_pixels):(dim_y-distance_from_border),
   #       (dim_x-distance_from_border-length_scale_bar_pixels):(dim_x-distance_from_border),
-  #       1:dim_z] <- 1
-  image[(dim_x-distance_from_border-length_scale_bar_pixels):(dim_x-distance_from_border),
-        (dim_y-distance_from_border-heigth_scale_bar_pixels):(dim_y-distance_from_border),
-        1:dim_z] <- 1
+  #       1:dim_c] <- 1
+  if(dim_z == 1){
+    image[(dim_x-distance_from_border-length_scale_bar_pixels):(dim_x-distance_from_border),
+          (dim_y-distance_from_border-heigth_scale_bar_pixels):(dim_y-distance_from_border),
+          1:dim_c] <- 1
+  }else{
+    image[(dim_x-distance_from_border-length_scale_bar_pixels):(dim_x-distance_from_border),
+          (dim_y-distance_from_border-heigth_scale_bar_pixels):(dim_y-distance_from_border),
+          1:dim_c,1:dim_z] <- 1
+  }
 
-  # Add length and unit
+
+  # Add length of scale bar and unit
   # number_pos_x <- dim_y-distance_from_border-heigth_scale_bar_pixels
   # number_pos_y <- dim_x-distance_from_border-0.5*length_scale_bar_pixels
   number_pos_x <- dim_x-distance_from_border-0.5*length_scale_bar_pixels
@@ -66,38 +87,67 @@ addScaleBar <- function(image = NULL,
   scale_legend_path <- paste(length_scale_bar_microns, "microns.tif", sep="")
   scale_legend_path <- system.file("scale", scale_legend_path, package = "cellPixels")
 
-  scale_legend_image <- tiff::readTIFF(source = scale_legend_path, convert = TRUE,
-                                       info = FALSE)
+  scale_legend_image <- EBImage::readImage(files = scale_legend_path,
+                                           type = "tiff")
+  # scale_legend_image <- tiff::readTIFF(source = scale_legend_path,
+  #                                      convert = TRUE,
+  #                                      info = FALSE)
+
   # Only keep the black layer
   scale_legend_image <- scale_legend_image[,,4]
 
   # Rescale image
-  resize_factor <- dim_x/15/dim(scale_legend_image)[2]
+  resize_factor <- dim_x/15/dim(scale_legend_image)[1]
   scale_legend_image <- resizeImage(image = scale_legend_image,
                                     resize_factor = resize_factor)
 
-  dim_legend_x <- dim(scale_legend_image)[2]
-  dim_legend_y <- dim(scale_legend_image)[1]
+  dim_legend_x <- dim(scale_legend_image)[1]
+  dim_legend_y <- dim(scale_legend_image)[2]
   # dim_legend_x <- dim(scale_legend_image)[1]
   # dim_legend_y <- dim(scale_legend_image)[2]
 
   # Add number images to image
-  start_x <- dim_x-distance_from_border-0.5*length_scale_bar_pixels-0.5*dim_legend_x
-  start_y <- dim_y-distance_from_border-heigth_scale_bar_pixels-1.1*dim_legend_y
+  start_x <- floor(dim_x-distance_from_border-0.5*length_scale_bar_pixels-0.5*dim_legend_x)
+  start_y <- floor(dim_y-distance_from_border-heigth_scale_bar_pixels-1.1*dim_legend_y)
   # start_x <- dim_x-distance_from_border-0.5*length_scale_bar_pixels-0.5*dim_legend_x
   # start_y <- dim_y-distance_from_border-heigth_scale_bar_pixels-1.1*dim_legend_y
 
   # for(row in 1:dim_legend_y){
   #   for(col in 1:dim_legend_x){
-  for(col in 1:dim_legend_x){
-    for(row in 1:dim_legend_y){
-      if(scale_legend_image[row, col] > 0){
-        # if(scale_legend_image[col, row] > 0){
-        # image[start_y+row, start_x+col, 1:dim_z] <- scale_legend_image[row, col]
-        image[start_x+col, start_y+row, 1:dim_z] <- scale_legend_image[row, col]
-      }
-    }
+
+  # for(col in 1:dim_legend_x){
+  #   for(row in 1:dim_legend_y){
+  #     if(scale_legend_image[row, col] > 0){
+  #       # if(scale_legend_image[col, row] > 0){
+  #       # image[start_y+row, start_x+col, 1:dim_c] <- scale_legend_image[row, col]
+  #       image[start_x+col, start_y+row, 1:dim_c] <- scale_legend_image[row, col]
+  #     }
+  #   }
+  # }
+
+  # Add \um image to original image
+  scale_legend_image_copy <- scale_legend_image
+  scale_legend_image <- EBImage::Image(dim = dim(image), colormode = "color")
+
+  if(dim_z == 1){
+    scale_legend_image[start_x:(start_x+dim_legend_x-1),
+                       start_y:(start_y+dim_legend_y-1),] <-
+      # EBImage::transpose(scale_legend_image_copy)
+      scale_legend_image_copy
+  }else{
+    scale_legend_image[start_x:(start_x+dim_legend_x-1),
+                       start_y:(start_y+dim_legend_y-1),,] <-
+      # EBImage::transpose(scale_legend_image_copy)
+      scale_legend_image_copy
   }
+
+
+  image <- scale_legend_image + image
+  image[image > 1] <- 1
+
+  # if(image_was_EBImage){
+  #   image <- EBImage::Image(data = image_data, colormode = "Color")
+  # }
 
   return(image)
 }
