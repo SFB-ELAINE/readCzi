@@ -11,11 +11,13 @@ readCziMetadata_LSM(
 )
 }
 \arguments{
-\item{metadata}{A character (loaded metadata in a string)}
+\item{metadata}{Loaded metadata as a string.}
 
-\item{number_of_channels}{A number}
+\item{number_of_channels}{A number representing the number of channels
+(color layers).}
 
-\item{number_of_tracks}{A number}
+\item{number_of_tracks}{A number representing the number of experimental
+tracks.}
 }
 \description{
 Check for LSM-specific values in metadata

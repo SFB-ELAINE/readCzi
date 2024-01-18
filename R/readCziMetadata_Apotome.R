@@ -1,6 +1,9 @@
 #' Check for apotome-specific values in metadata
-#' @param metadata A character (loaded metadata in a string)
-#' @param number_of_channels A number
+#'
+#' @param metadata Loaded metadata as a string.
+#' @param number_of_channels A number representing the number of channels
+#' (color layers).
+#'
 #' @keywords internal
 
 readCziMetadata_Apotome <- function(metadata = NULL,

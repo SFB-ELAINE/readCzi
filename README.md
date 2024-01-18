@@ -9,7 +9,7 @@ The R package **readCzi** has been checked with image data from
  * ZEISS laser scanning microscopes (1 to 3 channels, 1 to 3 tracks, 1 to n z layers).
  Please contact Kai for further information and sample data.
 
-## Example
+## Example code for using the R package
 The following example (script and results) shows the capabilities of the package.
 The script is found in `inst/testscript.R`.
 
@@ -17,7 +17,7 @@ The script is found in `inst/testscript.R`.
 # Testscript for using the R package readCzi +++++++++++++++++++++++++++++++
 # Author: Kai Budde-Sagert
 # Created: 2021/04/08
-# Last changed: 2023/11/29
+# Last changed: 2024/01/17
 
 
 # Delete everything in the environment
@@ -27,7 +27,7 @@ graphics.off()
 
 # Load packages ############################################################
 groundhog.day <- "2023-01-01"
-if(!any(grepl(pattern = "groundhog", x = installed.packages(),ignore.case = TRUE))){
+if(!any(grepl(pattern = "groundhog", x = installed.packages(), ignore.case = TRUE))){
   install.packages("groundhog")
 }
 
@@ -43,7 +43,7 @@ if(!("EBImage" %in% utils::installed.packages())){
 
 require(EBImage)
 
-# Install Python package for reading CZI files
+# Install Python package for reading data of CZI files
 # (Users will be asked to install miniconda when starting for the first time)
 if(! "czifile" %in% reticulate::py_list_packages()$package){
   reticulate::py_install("czifile")
@@ -92,20 +92,9 @@ convertCziToTif(input_file = input_file,
 
 The results are the following:
 
-**1. AxioImager_Test.czi**
+**1. LSM_threeChannels.czi**
 
-  * Original image:
-    ![Original converted AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_AxioImager_Test/AxioImager_Test_small.jpg?raw=true)
-  
-  * Histogram equalized image (using the clahe (Contrast Limited Adaptive Histogram Equalization) method of the [EBImage R package](https://rdrr.io/bioc/EBImage/man/clahe.html)):
-    ![Histogram equalized AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_AxioImager_Test/AxioImager_Test_histogram_equalized_small.jpg?raw=true)
-  
-  * Normalized image (normalizing each channel separately):
-    ![Normalized AxioImager image](https://github.com/SFB-ELAINE/readCzi/blob/main/examples/output_readme/output_AxioImager_Test/AxioImager_Test_normalized_small.jpg?raw=true)
-  
-**2. LSM_threeChannels.czi**
-
-  * Original images (z-stack layers + projection (average method)):
+  * Original images (z-stack layers + projection (maximum intensity method)):
   
     * Layer 1:
     ![Original converted LSM image (z-stack layer 1)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z1_small.jpg?raw=true)
@@ -134,11 +123,11 @@ The results are the following:
     ![Original converted LSM image (z-stack layer 24)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z24_small.jpg?raw=true)
     * Layer 25:
     ![Original converted LSM image (z-stack layer 25)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_z25_small.jpg?raw=true)
-    * Z-stack projection (average method):
-    ![Original converted LSM image (z-stack)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_zstack_small.jpg?raw=true)
+    * Z-stack projection (maximum intensity method):
+    ![Original converted LSM image (z-stack projection)](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_projection_small.jpg?raw=true)
     * Histogram equalized z-stack projection (using the clahe method of the [EBImage R package](https://rdrr.io/bioc/EBImage/man/clahe.html)):
-    ![Histogram equalized LSM z-stack image](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_zstack_histogram_equalized_small.jpg?raw=true)
+    ![Histogram equalized LSM z-stack projection](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_projection_histogram_equalized_small.jpg?raw=true)
     * Normalized histogram equalized z-stack projection (normalizing each channel separately):
-    ![Normalized LSM z-stack image](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_zstack_histogram_equalized_normalized_small.jpg?raw=true)
+    ![Normalized and histogram equalized LSM z-stack projection](https://github.com/SFB-ELAINE/readCzi/blob/main/docs/LSM_threeChannels_projection_histogram_equalized_normalized_small.jpg?raw=true)
 
-(The jpgs were created with the R package 'magick'. Please see ´inst/testscript.R´)
+(The jpgs were created with the R package 'magick'. Please see ´inst/testscript.R´ for details.)

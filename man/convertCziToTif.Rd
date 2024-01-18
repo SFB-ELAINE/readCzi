@@ -2,63 +2,57 @@
 % Please edit documentation in R/convertCziToTif.R
 \name{convertCziToTif}
 \alias{convertCziToTif}
-\alias{convertczitotif}
-\alias{convertCzitotif}
-\alias{convertcziTotif}
-\alias{convertczitoTif}
-\alias{convertCziTotif}
-\alias{convertcziToTif}
-\title{convertCziToTif}
+\title{Imports a czi file and saves it as a tif}
 \usage{
 convertCziToTif(
   input_file = NULL,
   output_dir = "output",
   convert_all_slices = FALSE,
-  stack_image = TRUE,
-  stack_method = "average",
-  higher_contrast_slices = FALSE,
-  higher_contrast_stack = TRUE,
-  normalize_stack = TRUE,
-  change_layers = "none",
+  zstack_projection = TRUE,
+  projection_method = "max",
+  higher_contrast_layers = FALSE,
+  higher_contrast_projection = TRUE,
+  normalize_projection = TRUE,
+  change_color_layers = "none",
   add_scale_bar = TRUE
 )
 }
 \arguments{
-\item{input_file}{A character (path to czi file to be converted)}
+\item{input_file}{Path to a CZI file as a string.}
 
-\item{output_dir}{A character (name of output directory)}
+\item{output_dir}{Path to a directory where the results are to be saved
+as a string.}
 
-\item{convert_all_slices}{A logical (T/F for converting and saving all
-z-slices)}
+\item{convert_all_slices}{A Boolean stating whether all z-stack layers
+of a CZI files are to be converted to tifs. (FALSE is the default value.)}
 
-\item{stack_image}{A logical (T/F for calculating a z-stack)}
+\item{zstack_projection}{A Boolean stating whether the a projection of a z-stack
+image is to be calculated. (TRUE is the default value.)}
 
-\item{stack_method}{A character (method for stacking the images: average,
-maxprojection)}
+\item{projection_method}{A character representing the method for calculating
+the image projection: mean or max (default value).}
 
-\item{higher_contrast_slices}{A logical (T/F for enhancing the contrast
-of the slices)}
+\item{higher_contrast_layers}{A Boolean stating wheterh the contrast
+of the z-stack layers should be enhanced using `EBImage::clahe()`.
+(FALSE is the default value.)}
 
-\item{higher_contrast_stack}{A logical (T/F for enhancing the contrast
-of the z-stack or original image if it is not a z stack)}
+\item{higher_contrast_projection}{A Boolean stating whether the contrast
+of the z-stack projection or the original image if it is not a z stack
+shall be enhanced using `EBImage::clahe()`. (TRUE is the default value.)}
 
-\item{normalize_stack}{A logical (T/F for normalizing intensities of stack)}
+\item{normalize_projection}{A Boolean statin whether the z-stack projection
+shall be normalized. (TRUE is the default value.)}
 
-\item{change_layers}{A character (either "none" or, e.g., "green<->red")}
+\item{change_color_layers}{A character stating the color layers to be
+swuitched (either "none" or, e.g., "green<->red").}
 
-\item{add_scale_bar}{A logic (add scale bar to all images that are saved
-if true)}
+\item{add_scale_bar}{A Boolean stating whether to add scale bar to all
+images that are saved. (TRUE is the default value.)}
 }
 \value{
 Nothing but saves the converted czi file as tif file(s).
 }
 \description{
-Imports czi file and save them as tif
-}
-\details{
-This functions saves a multidimensional array (image) as tifs
+`convertCziToTif()` saves a multidimensional array (image) as tifs
 and stacks/edits the images if required.
-}
-\author{
-Kai Budde-Sagert
 }

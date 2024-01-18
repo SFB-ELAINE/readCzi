@@ -1,7 +1,11 @@
 #' Check for LSM-specific values in metadata
-#' @param metadata A character (loaded metadata in a string)
-#' @param number_of_channels A number
-#' @param number_of_tracks A number
+#'
+#' @param metadata Loaded metadata as a string.
+#' @param number_of_channels A number representing the number of channels
+#' (color layers).
+#' @param number_of_tracks A number representing the number of experimental
+#' tracks.
+#'
 #' @keywords internal
 
 readCziMetadata_LSM <- function(metadata = NULL,

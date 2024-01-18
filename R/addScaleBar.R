@@ -1,22 +1,20 @@
-#' @title addScaleBar
-#' @description Add a horizontal scale bare to image
-#' @details Add a scale bar to a tiff image depending on the meta data of
-#' the czi file
-#' @aliases addscaleBar addScalebar addscalebar
-#' @author Kai Budde-Sagert
-#' @export addScaleBar
-#' @param image An array (2 or 3 dimensional array, could also be of
-#' formal class image by package EBimage)
-#' @param length_per_pixel_in_um A number (length per pixel in um)
-#' @param distance_from_border A number (distance in pixels for the scale bar)
-#' @param number_size_factor A number (factor for resizing the number)
+#' Add a horizontal scale bar to image
+#'
+#' `addScaleBar()` adds a scale bar to an image whose size depends on
+#' the metadata of the image
+#'
+#' @param image A 2 or 3 dimensional array which could also be of the
+#' formal EBImage image class.
+#' @param length_per_pixel_in_um A number representing thelength per pixel in um.
+#' @param distance_from_border A number being the distance in pixels of the
+#' scale bar from the right image border.
+#'
 #' @returns An array (image with added scale bar).
 
 
 addScaleBar <- function(image = NULL,
                         length_per_pixel_in_um = NULL,
-                        distance_from_border = 20,
-                        number_size_factor = 1){
+                        distance_from_border = 20){
 
   dim_x <- dim(image)[1]
   dim_y <- dim(image)[2]
@@ -68,7 +66,7 @@ addScaleBar <- function(image = NULL,
 
   # Get the file names with the text
   scale_legend_path <- paste(length_scale_bar_microns, "microns.tif", sep="")
-  scale_legend_path <- system.file("scale", scale_legend_path, package = "cellPixels")
+  scale_legend_path <- system.file("scale", scale_legend_path, package = "readCzi")
 
   scale_legend_image <- EBImage::readImage(files = scale_legend_path,
                                            type = "tiff")

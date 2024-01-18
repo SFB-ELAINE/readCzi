@@ -2,27 +2,19 @@
 % Please edit documentation in R/readCzi.R
 \name{readCzi}
 \alias{readCzi}
-\alias{readczi}
-\alias{readCZI}
-\title{readCzi}
+\title{Imports czi files}
 \usage{
 readCzi(input_file = NULL)
 }
 \arguments{
-\item{input_file}{A character (path to czi file to be converted)}
+\item{input_file}{Path to a CZI file as a string.}
 }
 \value{
 A multidimensional array with the following dimensions:
 \code{(x, y, c, z)} with the channels \code{c}.
 }
 \description{
-Imports czi files
-}
-\details{
-The function returns a multidimensional array with pixel
-intensities from 0 to 1. The array's dimensions are:
-1) row (y), 2) column (x), 3) channel (red, green, blue), 4) z sections (z)
-}
-\author{
-Kai Budde-Sagert
+`readCzi()` returns a multidimensional array with pixel intensities
+from 0 to 1. The array's dimensions are: 1) row (y), 2) column (x),
+3) channel (red, green, blue), 4) z sections (z).
 }

@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi +++++++++++++++++++++++++++++++
 # Author: Kai Budde-Sagert
 # Created: 2021/04/08
-# Last changed: 2023/11/29
+# Last changed: 2024/01/17
 
 
 # Delete everything in the environment
@@ -35,10 +35,9 @@ if(! "czifile" %in% reticulate::py_list_packages()$package){
 }
 
 # Install this R package for reading CZI images
-if(!("readCzi" %in% installed.packages()[,"Package"])){
-  devtools::install_github("SFB-ELAINE/readCzi")
-}
+devtools::install_github("SFB-ELAINE/readCzi", upgrade = "ask")
 require(readCzi)
+# Alternatively:
 # devtools::load_all()
 # devtools::document()
 # devtools::check()
@@ -50,7 +49,7 @@ require(readCzi)
 input_file <- system.file("extdata", "LSM_threeChannels.czi",
                           package = "readCzi", mustWork = TRUE)
 
-# # Examples for testing
+# Examples for testing
 # input_file <- system.file("examplesForTesting", "Apotome_Test.czi",
 #                           package = "readCzi", mustWork = TRUE)
 # input_file <- system.file("examplesForTesting", "AxioImager_Test.czi",
@@ -66,8 +65,6 @@ input_file <- system.file("extdata", "LSM_threeChannels.czi",
 # input_file <- system.file("examplesForTesting", "LSM_twoTracksThreeChannels.czi",
 #                           package = "readCzi", mustWork = TRUE)
 # input_file <- system.file("examplesForTesting", "LSM_withTransmission.czi",
-#                           package = "readCzi", mustWork = TRUE)
-# input_file <- system.file("examplesForTesting", "LSM_zstack_threeChannels.czi",
 #                           package = "readCzi", mustWork = TRUE)
 
 
@@ -92,9 +89,11 @@ readr::write_csv2(x = df_metadata, file = file_path_de)
 
 ## 3. Convert czi file to tifs ---------------------------------------------
 # convertCziToTif(input_file = input_file) # Use this for examples for testing
+
 convertCziToTif(input_file = input_file,
                 convert_all_slices = TRUE)
-
+print(paste0("The results can be found here: ",
+             file.path(dirname(input_file),"output")))
 
 ## 4. Copy results to doc directory for README -----------------------------
 image_files <- list.files(path = system.file("extdata", "output",

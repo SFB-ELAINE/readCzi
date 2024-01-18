@@ -1,14 +1,14 @@
-#' @title readCzi
-#' @description Imports czi files
-#' @details The function returns a multidimensional array with pixel
-#' intensities from 0 to 1. The array's dimensions are:
-#' 1) row (y), 2) column (x), 3) channel (red, green, blue), 4) z sections (z)
-#' @aliases readczi readCZI
-#' @author Kai Budde-Sagert
-#' @export readCzi
-#' @param input_file A character (path to czi file to be converted)
+#' Imports czi files
+#'
+#' `readCzi()` returns a multidimensional array with pixel intensities
+#' from 0 to 1. The array's dimensions are: 1) row (y), 2) column (x),
+#' 3) channel (red, green, blue), 4) z sections (z).
+#'
+#' @param input_file Path to a CZI file as a string.
+#'
 #' @returns A multidimensional array with the following dimensions:
 #' \code{(x, y, c, z)} with the channels \code{c}.
+#' @export readCzi
 
 readCzi <- function(input_file = NULL) {
 

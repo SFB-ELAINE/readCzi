@@ -11,9 +11,10 @@ readCziMetadata_AxioImager(
 )
 }
 \arguments{
-\item{metadata}{A character (loaded metadata in a string)}
+\item{metadata}{Loaded metadata as a string.}
 
-\item{number_of_channels}{A number}
+\item{number_of_channels}{A number representing the number of channels
+(color layers).}
 }
 \description{
 Check for specific Axio-imager values in metadata

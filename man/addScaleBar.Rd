@@ -2,38 +2,27 @@
 % Please edit documentation in R/addScaleBar.R
 \name{addScaleBar}
 \alias{addScaleBar}
-\alias{addscaleBar}
-\alias{addScalebar}
-\alias{addscalebar}
-\title{addScaleBar}
+\title{Add a horizontal scale bar to image}
 \usage{
 addScaleBar(
   image = NULL,
   length_per_pixel_in_um = NULL,
-  distance_from_border = 20,
-  number_size_factor = 1
+  distance_from_border = 20
 )
 }
 \arguments{
-\item{image}{An array (2 or 3 dimensional array, could also be of
-formal class image by package EBimage)}
+\item{image}{A 2 or 3 dimensional array which could also be of the
+formal EBImage image class.}
 
-\item{length_per_pixel_in_um}{A number (length per pixel in um)}
+\item{length_per_pixel_in_um}{A number representing thelength per pixel in um.}
 
-\item{distance_from_border}{A number (distance in pixels for the scale bar)}
-
-\item{number_size_factor}{A number (factor for resizing the number)}
+\item{distance_from_border}{A number being the distance in pixels of the
+scale bar from the right image border.}
 }
 \value{
 An array (image with added scale bar).
 }
 \description{
-Add a horizontal scale bare to image
-}
-\details{
-Add a scale bar to a tiff image depending on the meta data of
-the czi file
-}
-\author{
-Kai Budde-Sagert
+`addScaleBar()` adds a scale bar to an image whose size depends on
+the metadata of the image
 }

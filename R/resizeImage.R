@@ -1,12 +1,12 @@
-#' @title resizeImage
-#' @description Resizes an image
-#' @details Resizes an image with a given scaling factor
-#' @aliases resizeimage
-#' @author Kai Budde-Sagert
+#' Resize an image
+#'
+#' `resizeImage()` resizes an image with a given scaling factor
+#'
+#' @param image A one- to three-dimensional array of numbers between 0 and 1.
+#' @param resize_factor A number being the factor for resizing an image.
+#'
+#' @returns An array (resized image).
 #' @export resizeImage
-#' @param image An one to three-dimensional array of numbers between 0 and 1
-#' @param resize_factor A number (factor for resizing an image)
-#' @returns A reduced array (image).
 
 resizeImage <- function(image = NULL,
                         resize_factor = 1){
@@ -16,6 +16,7 @@ resizeImage <- function(image = NULL,
     print(paste("Please call the function with an image.", sep=""))
     return()
   }
+
   if(is.null(resize_factor)){
     print(paste("Please call the function with a number", sep=""))
     return()
@@ -31,7 +32,7 @@ resizeImage <- function(image = NULL,
     return(image)
   }
 
-  # Shrink image if resize_factor </> 1 ---------------------------------
+  # Shrink image if resize_factor </> 1 ------------------------------------
   if(resize_factor > 0){
 
     new_height <-  round(resize_factor * dim(image)[1])

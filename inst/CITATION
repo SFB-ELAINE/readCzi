@@ -1,10 +1,10 @@
 citHeader("To cite the readCzi package in publications, please use:")
 
 bibentry(bibtype = "Manual",
-  title = "{readCzi}: Read CZI image files, convert them to tifs, and save metadata",
+  title = "{readCzi}: R package to read CZI image files, convert them to tifs, and save metadata",
   author = person("Kai", "Budde-Sagert"),
-  year = 2023,
-  note = "R package version 0.3.0",
+  year = 2024,
+  note = "R package version 0.4.0",
   doi = "10.5281/zenodo.10231885",
   url = "https://github.com/SFB-ELAINE/readCzi"
 )
