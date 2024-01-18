@@ -8,7 +8,7 @@ message: 'To cite package "readCzi" in publications use:'
 type: software
 license: GPL-3.0-or-later
 title: 'readCzi: Read CZI image files, convert them to tifs, and save metadata'
-version: 0.3.0
+version: 0.4.0
 doi: 10.5281/zenodo.10231885
 abstract: The package reads (z-stack) CZI microscopy files, edits them, and stores
   the results in the tif format. The metadata is also read, transformed into a tibble,
@@ -20,14 +20,15 @@ authors:
   orcid: https://orcid.org/0000-0001-6836-9865
 preferred-citation:
   type: manual
-  title: 'readCzi: Read CZI image files, convert them to tifs, and save metadata'
+  title: 'readCzi: R package to read CZI image files, convert them to tifs, and save
+    metadata'
   authors:
   - family-names: Budde-Sagert
     given-names: Kai
     email: kai.budde-sagert@uni-rostock.de
     orcid: https://orcid.org/0000-0001-6836-9865
-  year: '2023'
-  notes: R package version 0.3.0
+  year: '2024'
+  notes: R package version 0.4.0
   doi: 10.5281/zenodo.10231885
   url: https://github.com/SFB-ELAINE/readCzi
 repository-code: https://github.com/SFB-ELAINE/readCzi
@@ -46,7 +47,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
   version: '>= 4.0.0'
@@ -61,7 +62,7 @@ references:
     given-names: Martin
     email: martin.morgan@roswellpark.org
     orcid: https://orcid.org/0000-0002-5874-8148
-  year: '2023'
+  year: '2024'
   version: '>= 1.30.19'
 - type: software
   title: EBImage
@@ -84,7 +85,7 @@ references:
     given-names: with contributions from Joseph
   - family-names: Marais
     given-names: Philip A.
-  year: '2023'
+  year: '2024'
   version: '>= 4.40.0'
 - type: software
   title: reticulate
@@ -103,7 +104,7 @@ references:
     given-names: Yuan
     email: terrytangyuan@gmail.com
     orcid: https://orcid.org/0000-0001-5243-233X
-  year: '2023'
+  year: '2024'
   version: '>= 1.26'
 - type: software
   title: tibble
@@ -118,7 +119,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
-  year: '2023'
+  year: '2024'
   version: '>= 3.1.8'
 - type: software
   title: xml2
@@ -134,5 +135,5 @@ references:
     given-names: Jim
   - family-names: Ooms
     given-names: Jeroen
-  year: '2023'
+  year: '2024'
   version: '>= 1.3.3'
