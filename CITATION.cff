@@ -54,13 +54,17 @@ references:
   title: BiocManager
   abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
   notes: Imports
-  url: https://github.com/Bioconductor/BiocManager
+  url: https://bioconductor.github.io/BiocManager/
   repository: https://CRAN.R-project.org/package=BiocManager
   authors:
   - family-names: Morgan
     given-names: Martin
     email: martin.morgan@roswellpark.org
     orcid: https://orcid.org/0000-0002-5874-8148
+  - family-names: Ramos
+    given-names: Marcel
+    email: marcel.ramos@roswellpark.org
+    orcid: https://orcid.org/0000-0002-3242-0582
   year: '2024'
   version: '>= 1.30.19'
 - type: software
@@ -70,7 +74,7 @@ references:
   url: https://github.com/aoles/EBImage
   repository: https://bioconductor.org/
   authors:
-  - family-names: Oles
+  - family-names: Oleś
     given-names: Andrzej
   - family-names: Pau
     given-names: Gregoire
@@ -85,6 +89,7 @@ references:
   - family-names: Marais
     given-names: Philip A.
   year: '2024'
+  doi: 10.18129/B9.bioc.EBImage
   version: '>= 4.40.0'
 - type: software
   title: reticulate
@@ -95,10 +100,10 @@ references:
   authors:
   - family-names: Ushey
     given-names: Kevin
-    email: kevin@rstudio.com
+    email: kevin@posit.co
   - family-names: Allaire
     given-names: JJ
-    email: jj@rstudio.com
+    email: jj@posit.co
   - family-names: Tang
     given-names: Yuan
     email: terrytangyuan@gmail.com
@@ -114,7 +119,8 @@ references:
   authors:
   - family-names: Müller
     given-names: Kirill
-    email: krlmlr+r@mailbox.org
+    email: kirill@cynkra.com
+    orcid: https://orcid.org/0000-0002-1416-3412
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
@@ -129,7 +135,7 @@ references:
   authors:
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@rstudio.com
+    email: hadley@posit.co
   - family-names: Hester
     given-names: Jim
   - family-names: Ooms
