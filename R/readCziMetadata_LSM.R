@@ -91,6 +91,8 @@ readCziMetadata_LSM <- function(metadata = NULL,
   laser_scan_zoom_x <- rep(x = NA, number_of_channels)
   laser_scan_zoom_y <- rep(x = NA, number_of_channels)
   photon_conversion_factors <- rep(x = NA, number_of_channels)
+  pinhole_size_in_airy_unit <- rep(x = NA, number_of_channels)
+  pinhole_diameter_in_m <- rep(x = NA, number_of_channels)
   detector_gain <- rep(x = NA, number_of_channels)
   digital_gain <- rep(x = NA, number_of_channels)
   amplifier_offset <- rep(x = NA, number_of_channels)
@@ -170,6 +172,11 @@ readCziMetadata_LSM <- function(metadata = NULL,
       laser_scan_zoom_y[i] <- as.numeric(unlist(channel_information[[1]]$LaserScanInfo$ZoomY))
     }
 
+    # Pinhole settings
+    if(!is.null(unlist(channel_information[[1]]$PinholeSizeAiry))){
+      pinhole_size_in_airy_unit[i] <- as.numeric(unlist(unlist(channel_information[[1]]$PinholeSizeAiry)))
+    }
+
     # Detector settings
     if(!is.null(unlist(channel_information[[1]]$DetectorSettings$PhotonConversionFactor))){
       photon_conversion_factors[i] <- as.numeric(unlist(channel_information[[1]]$DetectorSettings$PhotonConversionFactor))
@@ -192,6 +199,15 @@ readCziMetadata_LSM <- function(metadata = NULL,
     # Contrast Method
     if(length(detector_information)>0){
       detector_identifier[i] <- xml2::xml_text(x = detector_information)
+    }
+
+    look_for <- paste(".//Detectors/Detector[@Id='", df_channel_info$channel_id[i], "']", sep="")
+    detector_information <- xml2::xml_find_all(x = metadata_XML, xpath = look_for)
+    detector_information <- xml2::as_list(detector_information)
+
+    # Pinhole diameter
+    if(!is.null(unlist(detector_information[[1]]$PinholeDiameter))){
+      pinhole_diameter_in_m[i] <- as.numeric(unlist(detector_information[[1]]$PinholeDiameter))
     }
 
   }
@@ -377,6 +393,12 @@ readCziMetadata_LSM <- function(metadata = NULL,
     "fluorophore_channel_1" = fluorophores[1],
     "fluorophore_channel_2" = fluorophores[2],
     "fluorophore_channel_3" = fluorophores[3],
+    "pinhole_size_in_airy_unit_1" = pinhole_size_in_airy_unit[1],
+    "pinhole_size_in_airy_unit_2" = pinhole_size_in_airy_unit[2],
+    "pinhole_size_in_airy_unit_3" = pinhole_size_in_airy_unit[3],
+    "pinhole_diameter_in_m_1" = pinhole_diameter_in_m[1],
+    "pinhole_diameter_in_m_2" = pinhole_diameter_in_m[2],
+    "pinhole_diameter_in_m_3" = pinhole_diameter_in_m[3],
     "detector_identifier_1" = detector_identifier[1],
     "detector_identifier_2" = detector_identifier[2],
     "detector_identifier_3" = detector_identifier[3],

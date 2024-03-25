@@ -1,5 +1,5 @@
 # -----------------------------------------------------------
-# CITATION file created with {cffr} R package, v0.5.0
+# CITATION file created with {cffr} R package, v1.0.0
 # See also: https://docs.ropensci.org/cffr/
 # -----------------------------------------------------------
  
@@ -7,8 +7,9 @@ cff-version: 1.2.0
 message: 'To cite package "readCzi" in publications use:'
 type: software
 license: GPL-3.0-or-later
-title: 'readCzi: Read CZI image files, convert them to tifs, and save metadata'
-version: 0.4.0
+title: 'readCzi: readCzi: R package to read CZI image files, convert them to tifs,
+  and save metadata'
+version: 0.4.1
 doi: 10.5281/zenodo.10231885
 abstract: The package reads (z-stack) CZI microscopy files, edits them, and stores
   the results in the tif format. The metadata is also read, transformed into a tibble,
@@ -28,7 +29,7 @@ preferred-citation:
     email: kai.budde-sagert@uni-rostock.de
     orcid: https://orcid.org/0000-0001-6836-9865
   year: '2024'
-  notes: R package version 0.4.0
+  notes: R package version 0.4.1
   doi: 10.5281/zenodo.10231885
   url: https://github.com/SFB-ELAINE/readCzi
 repository-code: https://github.com/SFB-ELAINE/readCzi
@@ -45,11 +46,10 @@ references:
   url: https://www.R-project.org/
   authors:
   - name: R Core Team
-  location:
-    name: Vienna, Austria
-  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
   version: '>= 4.0.0'
 - type: software
   title: BiocManager
