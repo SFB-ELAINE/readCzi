@@ -7,8 +7,7 @@ cff-version: 1.2.0
 message: 'To cite package "readCzi" in publications use:'
 type: software
 license: GPL-3.0-or-later
-title: 'readCzi: readCzi: R package to read CZI image files, convert them to tifs,
-  and save metadata'
+title: 'readCzi: Read CZI image files, convert them to tifs, and save metadata'
 version: 0.4.1
 doi: 10.5281/zenodo.10231885
 abstract: The package reads (z-stack) CZI microscopy files, edits them, and stores
@@ -55,17 +54,13 @@ references:
   title: BiocManager
   abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
   notes: Imports
-  url: https://bioconductor.github.io/BiocManager/
+  url: https://github.com/Bioconductor/BiocManager
   repository: https://CRAN.R-project.org/package=BiocManager
   authors:
   - family-names: Morgan
     given-names: Martin
     email: martin.morgan@roswellpark.org
     orcid: https://orcid.org/0000-0002-5874-8148
-  - family-names: Ramos
-    given-names: Marcel
-    email: marcel.ramos@roswellpark.org
-    orcid: https://orcid.org/0000-0002-3242-0582
   year: '2024'
   version: '>= 1.30.19'
 - type: software
@@ -75,7 +70,7 @@ references:
   url: https://github.com/aoles/EBImage
   repository: https://bioconductor.org/
   authors:
-  - family-names: Oleś
+  - family-names: Oles
     given-names: Andrzej
   - family-names: Pau
     given-names: Gregoire
@@ -90,7 +85,6 @@ references:
   - family-names: Marais
     given-names: Philip A.
   year: '2024'
-  doi: 10.18129/B9.bioc.EBImage
   version: '>= 4.40.0'
 - type: software
   title: reticulate
@@ -101,10 +95,10 @@ references:
   authors:
   - family-names: Ushey
     given-names: Kevin
-    email: kevin@posit.co
+    email: kevin@rstudio.com
   - family-names: Allaire
     given-names: JJ
-    email: jj@posit.co
+    email: jj@rstudio.com
   - family-names: Tang
     given-names: Yuan
     email: terrytangyuan@gmail.com
@@ -120,8 +114,7 @@ references:
   authors:
   - family-names: Müller
     given-names: Kirill
-    email: kirill@cynkra.com
-    orcid: https://orcid.org/0000-0002-1416-3412
+    email: krlmlr+r@mailbox.org
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
@@ -136,7 +129,7 @@ references:
   authors:
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@posit.co
+    email: hadley@rstudio.com
   - family-names: Hester
     given-names: Jim
   - family-names: Ooms
