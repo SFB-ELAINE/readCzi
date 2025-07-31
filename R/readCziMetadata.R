@@ -76,7 +76,7 @@ readCziMetadata <- function(input_file = NULL,
         metadata_XML_list$ImageDocument$Metadata$Information$Instrument$
           Microscopes$Microscope$System)
     }else{
-      microscopy_system <- xml2::xml_find_all(x = metadata_XML, xpath = ".//Microscope")
+      microscopy_system <- xml2::xml_find_all(x = metadata_XML, xpath = "//Microscope")
       microscopy_system <- unique(xml2::xml_attr(x = microscopy_system, attr = "Name"))
     }
 
@@ -137,10 +137,8 @@ readCziMetadata <- function(input_file = NULL,
     scaling_x_in_um <- tolower(scaling_x_in_um)
     scaling_x_in_um <- as.numeric(scaling_x_in_um)
   }else if(grepl(pattern = "<Distance Id=\"X\">", x = metadata, ignore.case = TRUE)){
-    scaling_x_in_um <- gsub(pattern = ".+<Distance Id=\"X\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
-                            replacement = "\\1", x = metadata)
-    scaling_x_in_um <- tolower(scaling_x_in_um)
-    scaling_x_in_um <- as.numeric(scaling_x_in_um)
+    scaling_x_in_um <- xml2::xml_find_all(x = metadata_XML, xpath = '//Distance[@Id="X"]/Value/text()')
+    scaling_x_in_um <- xml2::xml_double(scaling_x_in_um)
   }else{
     scaling_x_in_um <- NA
   }
@@ -155,10 +153,8 @@ readCziMetadata <- function(input_file = NULL,
     scaling_y_in_um <- tolower(scaling_y_in_um)
     scaling_y_in_um <- as.numeric(scaling_y_in_um)
   }else if(grepl(pattern = "<Distance Id=\"Y\">", x = metadata, ignore.case = TRUE)){
-    scaling_y_in_um <- gsub(pattern = ".+<Distance Id=\"Y\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
-                            replacement = "\\1", x = metadata)
-    scaling_y_in_um <- tolower(scaling_y_in_um)
-    scaling_y_in_um <- as.numeric(scaling_y_in_um)
+    scaling_y_in_um <- xml2::xml_find_all(x = metadata_XML, xpath = '//Distance[@Id="Y"]/Value/text()')
+    scaling_y_in_um <- xml2::xml_double(scaling_y_in_um)
   }else{
     scaling_y_in_um <- NA
   }
@@ -173,10 +169,8 @@ readCziMetadata <- function(input_file = NULL,
     scaling_z_in_um <- tolower(scaling_z_in_um)
     scaling_z_in_um <- as.numeric(scaling_z_in_um)
   }else if(grepl(pattern = "<Distance Id=\"Z\">", x = metadata, ignore.case = TRUE)){
-    scaling_z_in_um <- gsub(pattern = ".+<Distance Id=\"Z\">.+<Value>(.{1,30})</Value>.+</Distance>.+",
-                            replacement = "\\1", x = metadata)
-    scaling_z_in_um <- tolower(scaling_z_in_um)
-    scaling_z_in_um <- as.numeric(scaling_z_in_um)
+    scaling_z_in_um <- xml2::xml_find_all(x = metadata_XML, xpath = '//Distance[@Id="Z"]/Value/text()')
+    scaling_z_in_um <- xml2::xml_double(scaling_z_in_um)
   }else{
     scaling_z_in_um <- 0
   }
@@ -187,7 +181,6 @@ readCziMetadata <- function(input_file = NULL,
 
 
   # Image dimensions
-
   if(grepl(pattern = "SizeX", x = metadata_XML_list)){
     dim_x <- unlist(metadata_XML_list$ImageDocument$Metadata$Information$Image$SizeX)
     dim_x <- as.numeric(dim_x)
@@ -245,8 +238,11 @@ readCziMetadata <- function(input_file = NULL,
 
   }else if(# Type of microscope: LSM (in wide field acquisition mode)
     color_axis == "C" &&
-    #grepl(pattern = "<AcquisitionMode>WideField</AcquisitionMode>",x = metadata, ignore.case = TRUE)
-    grepl(pattern = "WideField", x = metadata_XML_list)){
+    (grepl(pattern = "WideField", x = metadata_XML_list) ||
+     as.logical(xml2::xml_attr(
+       xml2::xml_find_first(metadata_XML, xpath = "//ApoTomeAcquisitionSetup"),
+       "IsActivated"))
+    )){
     df_metadata <- readCziMetadata_Apotome(metadata,
                                            number_of_channels,
                                            number_of_tracks)

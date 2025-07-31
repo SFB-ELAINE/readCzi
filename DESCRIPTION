@@ -1,7 +1,7 @@
 Type: Package
 Package: readCzi
 Title: Read CZI image files, convert them to tifs, and save metadata
-Version: 0.4.1
+Version: 0.4.2
 Authors@R: 
     person("Kai", "Budde-Sagert", , "kai.budde-sagert@uni-rostock.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6836-9865"))
@@ -9,7 +9,7 @@ Maintainer: Kai Budde-Sagert <kai.budde-sagert@uni-rostock.de>
 Description: The package reads (z-stack) CZI microscopy files, edits them,
     and stores the results in the tif format. The metadata is also read,
     transformed into a tibble, and saved as a CSV file.
-License: GPL (>= 3)
+License: GPL-3 + file LICENSE
 URL: https://github.com/SFB-ELAINE/readCzi
 BugReports: https://github.com/SFB-ELAINE/readCzi/issues
 Depends: 
@@ -25,4 +25,4 @@ Remotes:
 ByteCompile: TRUE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

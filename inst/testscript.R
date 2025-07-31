@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi +++++++++++++++++++++++++++++++
 # Author: Kai Budde-Sagert
 # Created: 2021/04/08
-# Last changed: 2024/01/17
+# Last changed: 2025//17
 
 
 # Delete everything in the environment
@@ -10,7 +10,7 @@ rm(list = ls())
 graphics.off()
 
 # Load packages ############################################################
-groundhog.day <- "2023-01-01"
+groundhog.day <- "2024-12-01"
 if(!any(grepl(pattern = "groundhog", x = installed.packages(), ignore.case = TRUE))){
   install.packages("groundhog")
 }
