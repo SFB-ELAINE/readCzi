@@ -1,7 +1,7 @@
 # Testscript for using the R package readCzi +++++++++++++++++++++++++++++++
 # Author: Kai Budde-Sagert
 # Created: 2021/04/08
-# Last changed: 2025//17
+# Last changed: 2026/03/04
 
 
 # Delete everything in the environment
@@ -35,18 +35,23 @@ if(! "czifile" %in% reticulate::py_list_packages()$package){
 }
 
 # Install this R package for reading CZI images
-devtools::install_github("SFB-ELAINE/readCzi", upgrade = "ask")
-require(readCzi)
+# devtools::install_github("SFB-ELAINE/readCzi", upgrade = "ask")
+# require(readCzi)
 # Alternatively:
-# devtools::load_all()
+devtools::load_all()
 # devtools::document()
 # devtools::check()
+
+
 
 # Please adapt the following parameters ####################################
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 # Input file
 input_file <- system.file("extdata", "LSM_threeChannels.czi",
+                          package = "readCzi", mustWork = TRUE)
+
+input_file <- system.file("examplesForTesting", "Hoechst_NeuN_GFAP_Iba1_10x_04.10_XXX_D1-Apotome-Stitching_Ausschnitt_zprojection.czi",
                           package = "readCzi", mustWork = TRUE)
 
 # Examples for testing

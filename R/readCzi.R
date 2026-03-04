@@ -141,9 +141,16 @@ readCzi <- function(input_file = NULL) {
 
     color_axis <- "C"
 
-    rgb_layers <- c(df_metadata$red_channel,
-                    df_metadata$green_channel,
-                    df_metadata$blue_channel)
+    if(number_of_channels == 4){
+      rgb_layers <- c(df_metadata$red_channel,
+                      df_metadata$orange_channel,
+                      df_metadata$green_channel,
+                      df_metadata$blue_channel)
+    }else{
+      rgb_layers <- c(df_metadata$red_channel,
+                      df_metadata$green_channel,
+                      df_metadata$blue_channel)
+    }
 
     # Check if all channels have a designated color, if not, provide a color
     if(df_metadata$number_of_channels > sum(!is.na(rgb_layers))){
@@ -248,7 +255,11 @@ readCzi <- function(input_file = NULL) {
     # Reorder the layers according to the colors and add empty layer for
     # not existing colors
     copy_image_loaded <- image_loaded
-    image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 3, dim_z))
+    if(number_of_channels == 4){
+      image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 4, dim_z))
+    }else{
+      image_loaded <- array(data = 0, dim = c(dim_x, dim_y, 3, dim_z))
+    }
 
     # Copy image layers in the correct order depending on which dimension
     # the original image has
@@ -262,6 +273,12 @@ readCzi <- function(input_file = NULL) {
       }
       if(!is.na(rgb_layers[3]) && rgb_layers[3] != 0){
         image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,,,,,,]
+      }
+
+      if(number_of_channels == 4){
+        if(!is.na(rgb_layers[4]) && rgb_layers[4] != 0){
+          image_loaded[,,4,] <- copy_image_loaded[,,rgb_layers[4],,,,,,,,,]
+        }
       }
 
       # Check if the resulting array contains as many entries as needed
@@ -289,6 +306,12 @@ readCzi <- function(input_file = NULL) {
         image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,,]
       }
 
+      if(number_of_channels == 4){
+        if(!is.na(rgb_layers[4]) && rgb_layers[4] != 0){
+          image_loaded[,,4,] <- copy_image_loaded[,,rgb_layers[4],,,,,]
+        }
+      }
+
       # Check if the resulting array contains as many entries as needed
       if(dim_z == 1){
         check_array_dims <- length(new_array_order) + 1
@@ -302,6 +325,39 @@ readCzi <- function(input_file = NULL) {
         return()
       }
 
+    }else if(length(dim(copy_image_loaded)) == 7){
+
+      if(!is.na(rgb_layers[1]) & rgb_layers[1] != 0){
+        image_loaded[,,1,] <- copy_image_loaded[,,rgb_layers[1],,,,]
+      }
+      if(!is.na(rgb_layers[2]) & rgb_layers[2] != 0){
+        image_loaded[,,2,] <- copy_image_loaded[,,rgb_layers[2],,,,]
+      }
+      if(!is.na(rgb_layers[3]) & rgb_layers[3] != 0){
+        image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,,]
+      }
+
+      if(number_of_channels == 4){
+        if(!is.na(rgb_layers[4]) & rgb_layers[4] != 0){
+          image_loaded[,,4,] <- copy_image_loaded[,,rgb_layers[4],,,,]
+        }
+      }
+
+
+      # Check if the resulting array contains as many entries as needed
+      if(dim_z == 1){
+        check_array_dims <- length(new_array_order) + 1
+      }else{
+        check_array_dims <- length(new_array_order)
+      }
+
+      if(length(dim(image_loaded)) != check_array_dims){
+        print("There is more or less information than thought in the image.")
+        return()
+      }
+
+
+
 
     }else if(length(dim(copy_image_loaded)) == 6){
 
@@ -313,6 +369,12 @@ readCzi <- function(input_file = NULL) {
       }
       if(!is.na(rgb_layers[3]) & rgb_layers[3] != 0){
         image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,,]
+      }
+
+      if(number_of_channels == 4){
+        if(!is.na(rgb_layers[4]) & rgb_layers[3] != 0){
+          image_loaded[,,4,] <- copy_image_loaded[,,rgb_layers[4],,,]
+        }
       }
 
 
@@ -339,6 +401,12 @@ readCzi <- function(input_file = NULL) {
       }
       if(!is.na(rgb_layers[3]) & rgb_layers[3] != 0){
         image_loaded[,,3,] <- copy_image_loaded[,,rgb_layers[3],,]
+      }
+
+      if(number_of_channels == 4){
+        if(!is.na(rgb_layers[4]) & rgb_layers[4] != 0){
+          image_loaded[,,4,] <- copy_image_loaded[,,rgb_layers[4],,]
+        }
       }
 
 

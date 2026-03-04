@@ -82,6 +82,7 @@ readCziMetadata_Apotome <- function(metadata = NULL,
   light_source_intensities <- rep(x = NA, number_of_channels)
   exposure_times_in_ms <- rep(x = NA, number_of_channels)
   fluorophores <- rep(x = NA, number_of_channels)
+  display_colors <- rep(x = NA, number_of_channels)
 
   # Go through each channel and get information ############################
   for(i in 1:number_of_channels){
@@ -144,6 +145,18 @@ readCziMetadata_Apotome <- function(metadata = NULL,
     # Fluorphore
     fluorophores[i] <- unlist(channel_information[[1]]$Fluor)
 
+    # Displayed color (not yet used later on)
+    display_colors[i] <- gsub(pattern = "#FF", replacement = "", x = unlist(channel_information[[1]]$Color), ignore.case = TRUE)
+
+    if(display_colors[i] == "0000FF"){
+      display_colors[i] <- "blue"
+    }else if(display_colors[i] == "FF0000"){
+      display_colors[i] <- "red"
+    }else if(display_colors[i] == "FFAD00"){
+      display_colors[i] <- "orange"
+    }else if(display_colors[i] == "00FF00"){
+      display_colors[i] <- "green"
+    }
   }
 
   # Get scene information ##################################################
@@ -191,7 +204,10 @@ readCziMetadata_Apotome <- function(metadata = NULL,
   # green: #>= 500nm and <= 600nm
   blue_limit <- 500 #< 500nm
 
-  if(number_of_channels == 3){
+  if(number_of_channels == 4){
+    # 1: blue, 2: green, 3: orange, 4: red
+    channel_color <- channel_order
+  }else if(number_of_channels == 3){
     # 1: blue, 2: green, 3: red
     channel_color <- channel_order
   }else{
@@ -249,64 +265,144 @@ readCziMetadata_Apotome <- function(metadata = NULL,
     illumination_wavelengths_in_nm[illumination_wavelengths_in_nm < 1e-6] * 1e9
 
   # Put information into a data frame
-  df_metadata <- data.frame(
-    "fileName" = NA,
-    "acquisition_date" = NA,
-    "acquisition_time" = NA,
-    "microscopy_system" = NA,
-    "color_system" = NA,
-    "number_of_channels" = NA,
-    "number_of_tracks" = NA,
-    "objective" = NA,
-    "objective_magnification" = NA,
-    "dim_x" = NA,
-    "dim_y" = NA,
-    "dim_z" = NA,
-    "scaling_x_in_um" = NA,
-    "scaling_y_in_um" = NA,
-    "scaling_z_in_um" = NA,
-    "blue_channel" = channel_color[1],
-    "green_channel" = channel_color[2],
-    "red_channel" = channel_color[3],
-    "channel_name_1" = channel_names[1],
-    "channel_name_2" = channel_names[2],
-    "channel_name_3" = channel_names[3],
-    "track_id_channel_1" = track_ids[1],
-    "track_id_channel_2" = track_ids[2],
-    "track_id_channel_3" = track_ids[3],
-    "contrast_method_channel_1" = contrast_method[1],
-    "contrast_method_channel_2" = contrast_method[2],
-    "contrast_method_channel_3" = contrast_method[3],
-    "fluorophore_channel_1" = fluorophores[1],
-    "fluorophore_channel_2" = fluorophores[2],
-    "fluorophore_channel_3" = fluorophores[3],
-    "scene_name" = scene_name,
-    "scene_center_position_x" = scene_center_position_x,
-    "scene_center_position_y" = scene_center_position_y,
-    "contour_size_x" = contour_size_x,
-    "contour_size_y" = contour_size_y,
-    "acquisition_mode_channel_1" = acquisition_mode[1],
-    "acquisition_mode_channel_2" = acquisition_mode[2],
-    "acquisition_mode_channel_3" = acquisition_mode[3],
-    "illumination_type_channel_1" = illumination_type[1],
-    "illumination_type_channel_2" = illumination_type[2],
-    "illumination_type_channel_3" = illumination_type[3],
-    "illumination_wavelength_channel_1_in_nm" =  illumination_wavelengths_in_nm[1],
-    "illumination_wavelength_channel_2_in_nm" =  illumination_wavelengths_in_nm[2],
-    "illumination_wavelength_channel_3_in_nm" =  illumination_wavelengths_in_nm[3],
-    "excitation_wavelength_channel_1_in_nm" =  excitation_wavelengths_in_nm[1],
-    "excitation_wavelength_channel_2_in_nm" =  excitation_wavelengths_in_nm[2],
-    "excitation_wavelength_channel_3_in_nm" =  excitation_wavelengths_in_nm[3],
-    "emission_wavelength_channel_1_in_nm" =  emission_wavelengths_in_nm[1],
-    "emission_wavelength_channel_2_in_nm" =  emission_wavelengths_in_nm[2],
-    "emission_wavelength_channel_3_in_nm" =  emission_wavelengths_in_nm[3],
-    "light_source_intensity_channel_1" =  light_source_intensities[1],
-    "light_source_intensity_channel_2" =  light_source_intensities[2],
-    "light_source_intensity_channel_3" =  light_source_intensities[3],
-    "exposure_time_channel_1_in_ms" = exposure_times_in_ms[1],
-    "exposure_time_channel_2_in_ms" = exposure_times_in_ms[2],
-    "exposure_time_channel_3_in_ms" = exposure_times_in_ms[3]
-  )
+  if(number_of_channels == 4){
+    df_metadata <- data.frame(
+      "fileName" = NA,
+      "acquisition_date" = NA,
+      "acquisition_time" = NA,
+      "microscopy_system" = NA,
+      "color_system" = NA,
+      "number_of_channels" = NA,
+      "number_of_tracks" = NA,
+      "objective" = NA,
+      "objective_magnification" = NA,
+      "dim_x" = NA,
+      "dim_y" = NA,
+      "dim_z" = NA,
+      "scaling_x_in_um" = NA,
+      "scaling_y_in_um" = NA,
+      "scaling_z_in_um" = NA,
+      "blue_channel" = channel_color[1],
+      "green_channel" = channel_color[2],
+      "orange_channel" = channel_color[3],
+      "red_channel" = channel_color[4],
+      "channel_name_1" = channel_names[1],
+      "channel_name_2" = channel_names[2],
+      "channel_name_3" = channel_names[3],
+      "channel_name_4" = channel_names[4],
+      "channel_color_1" = display_colors[1],
+      "channel_color_2" = display_colors[2],
+      "channel_color_3" = display_colors[3],
+      "channel_color_4" = display_colors[4],
+      "track_id_channel_1" = track_ids[1],
+      "track_id_channel_2" = track_ids[2],
+      "track_id_channel_3" = track_ids[3],
+      "track_id_channel_4" = track_ids[4],
+      "contrast_method_channel_1" = contrast_method[1],
+      "contrast_method_channel_2" = contrast_method[2],
+      "contrast_method_channel_3" = contrast_method[3],
+      "contrast_method_channel_4" = contrast_method[4],
+      "fluorophore_channel_1" = fluorophores[1],
+      "fluorophore_channel_2" = fluorophores[2],
+      "fluorophore_channel_3" = fluorophores[3],
+      "fluorophore_channel_4" = fluorophores[4],
+      "scene_name" = scene_name,
+      "scene_center_position_x" = scene_center_position_x,
+      "scene_center_position_y" = scene_center_position_y,
+      "contour_size_x" = contour_size_x,
+      "contour_size_y" = contour_size_y,
+      "acquisition_mode_channel_1" = acquisition_mode[1],
+      "acquisition_mode_channel_2" = acquisition_mode[2],
+      "acquisition_mode_channel_3" = acquisition_mode[3],
+      "acquisition_mode_channel_4" = acquisition_mode[4],
+      "illumination_type_channel_1" = illumination_type[1],
+      "illumination_type_channel_2" = illumination_type[2],
+      "illumination_type_channel_3" = illumination_type[3],
+      "illumination_type_channel_4" = illumination_type[4],
+      "illumination_wavelength_channel_1_in_nm" =  illumination_wavelengths_in_nm[1],
+      "illumination_wavelength_channel_2_in_nm" =  illumination_wavelengths_in_nm[2],
+      "illumination_wavelength_channel_3_in_nm" =  illumination_wavelengths_in_nm[3],
+      "illumination_wavelength_channel_4_in_nm" =  illumination_wavelengths_in_nm[4],
+      "excitation_wavelength_channel_1_in_nm" =  excitation_wavelengths_in_nm[1],
+      "excitation_wavelength_channel_2_in_nm" =  excitation_wavelengths_in_nm[2],
+      "excitation_wavelength_channel_3_in_nm" =  excitation_wavelengths_in_nm[3],
+      "excitation_wavelength_channel_4_in_nm" =  excitation_wavelengths_in_nm[4],
+      "emission_wavelength_channel_1_in_nm" =  emission_wavelengths_in_nm[1],
+      "emission_wavelength_channel_2_in_nm" =  emission_wavelengths_in_nm[2],
+      "emission_wavelength_channel_3_in_nm" =  emission_wavelengths_in_nm[3],
+      "emission_wavelength_channel_4_in_nm" =  emission_wavelengths_in_nm[4],
+      "light_source_intensity_channel_1" =  light_source_intensities[1],
+      "light_source_intensity_channel_2" =  light_source_intensities[2],
+      "light_source_intensity_channel_3" =  light_source_intensities[3],
+      "light_source_intensity_channel_4" =  light_source_intensities[4],
+      "exposure_time_channel_1_in_ms" = exposure_times_in_ms[1],
+      "exposure_time_channel_2_in_ms" = exposure_times_in_ms[2],
+      "exposure_time_channel_3_in_ms" = exposure_times_in_ms[3],
+      "exposure_time_channel_4_in_ms" = exposure_times_in_ms[4]
+    )
+  }else{
+    df_metadata <- data.frame(
+      "fileName" = NA,
+      "acquisition_date" = NA,
+      "acquisition_time" = NA,
+      "microscopy_system" = NA,
+      "color_system" = NA,
+      "number_of_channels" = NA,
+      "number_of_tracks" = NA,
+      "objective" = NA,
+      "objective_magnification" = NA,
+      "dim_x" = NA,
+      "dim_y" = NA,
+      "dim_z" = NA,
+      "scaling_x_in_um" = NA,
+      "scaling_y_in_um" = NA,
+      "scaling_z_in_um" = NA,
+      "blue_channel" = channel_color[1],
+      "green_channel" = channel_color[2],
+      "red_channel" = channel_color[3],
+      "channel_name_1" = channel_names[1],
+      "channel_name_2" = channel_names[2],
+      "channel_name_3" = channel_names[3],
+      "channel_color_1" = display_colors[1],
+      "channel_color_2" = display_colors[2],
+      "channel_color_3" = display_colors[3],
+      "track_id_channel_1" = track_ids[1],
+      "track_id_channel_2" = track_ids[2],
+      "track_id_channel_3" = track_ids[3],
+      "contrast_method_channel_1" = contrast_method[1],
+      "contrast_method_channel_2" = contrast_method[2],
+      "contrast_method_channel_3" = contrast_method[3],
+      "fluorophore_channel_1" = fluorophores[1],
+      "fluorophore_channel_2" = fluorophores[2],
+      "fluorophore_channel_3" = fluorophores[3],
+      "scene_name" = scene_name,
+      "scene_center_position_x" = scene_center_position_x,
+      "scene_center_position_y" = scene_center_position_y,
+      "contour_size_x" = contour_size_x,
+      "contour_size_y" = contour_size_y,
+      "acquisition_mode_channel_1" = acquisition_mode[1],
+      "acquisition_mode_channel_2" = acquisition_mode[2],
+      "acquisition_mode_channel_3" = acquisition_mode[3],
+      "illumination_type_channel_1" = illumination_type[1],
+      "illumination_type_channel_2" = illumination_type[2],
+      "illumination_type_channel_3" = illumination_type[3],
+      "illumination_wavelength_channel_1_in_nm" =  illumination_wavelengths_in_nm[1],
+      "illumination_wavelength_channel_2_in_nm" =  illumination_wavelengths_in_nm[2],
+      "illumination_wavelength_channel_3_in_nm" =  illumination_wavelengths_in_nm[3],
+      "excitation_wavelength_channel_1_in_nm" =  excitation_wavelengths_in_nm[1],
+      "excitation_wavelength_channel_2_in_nm" =  excitation_wavelengths_in_nm[2],
+      "excitation_wavelength_channel_3_in_nm" =  excitation_wavelengths_in_nm[3],
+      "emission_wavelength_channel_1_in_nm" =  emission_wavelengths_in_nm[1],
+      "emission_wavelength_channel_2_in_nm" =  emission_wavelengths_in_nm[2],
+      "emission_wavelength_channel_3_in_nm" =  emission_wavelengths_in_nm[3],
+      "light_source_intensity_channel_1" =  light_source_intensities[1],
+      "light_source_intensity_channel_2" =  light_source_intensities[2],
+      "light_source_intensity_channel_3" =  light_source_intensities[3],
+      "exposure_time_channel_1_in_ms" = exposure_times_in_ms[1],
+      "exposure_time_channel_2_in_ms" = exposure_times_in_ms[2],
+      "exposure_time_channel_3_in_ms" = exposure_times_in_ms[3]
+    )
+  }
 
   return(df_metadata)
 
